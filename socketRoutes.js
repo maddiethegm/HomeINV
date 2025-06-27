@@ -1,5 +1,5 @@
 // socketRoutes.js
-
+// Socket routes not fully implemented yet
 const sql = require('mssql');
 
 function setupSocketRoutes(app, config) {

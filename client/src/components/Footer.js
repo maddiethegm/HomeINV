@@ -1,7 +1,4 @@
 // src/components/Navbar.js
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-
 function Footer() {
     return (
         <footer className="footer text-center py-3">

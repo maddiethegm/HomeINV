@@ -1,5 +1,4 @@
 // routes.js
-const express = require('express');
 const sql = require('mssql');
 
 function setupRoutes(app, config) {
