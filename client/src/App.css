@@ -1,0 +1,99 @@
+/* src/App.css */
+body {
+    background-color: #121212; /* Black background */
+    color: #ffffff; /* White text color for contrast */
+    font-family: 'Arial', sans-serif;
+}
+.container {
+    max-width: 80rem; /* Limit container width */
+}
+
+.card {
+    background-color: #f9f0f8; /* Dark gray card background */
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Glass-like effect with shadow */
+    overflow: hidden;
+}
+.loca-card {
+    color:#000000;
+}
+.card-img-top {
+    height: 150px; /* Fixed height for card images */
+    object-fit: cover; /* Ensure images cover the area without distortion */
+}
+
+.btn {
+     background-color:#c1bbbb;
+}
+.navbar {
+    color: #d2d3e0; /* White text for navbar items */
+    background-color: #938eb1;
+    font-weight: bold
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-custom {
+    border-color: #000000;
+    color:#c1bbbb;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background-color: #dba62b;
+    border-color: #c89300;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #b02a37;
+}
+/* src/App.css */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the container takes at least full viewport height */
+}
+
+.main-content {
+    flex: 1; /* Allow main content to grow and fill available space */
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+    color:#000000;
+    background-color: #f2f3fc;
+    padding: 10px;
+}
+
+.footer {
+    background-color: #2c2931;
+    color:#c1bbbb;
+    padding: 10px;
+    text-align: center;
+    max-height: min-content;
+}
