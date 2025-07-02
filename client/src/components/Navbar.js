@@ -1,6 +1,5 @@
 // src/components/Navbar.js
 import { Link, useNavigate } from 'react-router-dom';
-
 function Navbar() {
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
@@ -33,14 +32,14 @@ function Navbar() {
                             <li className="nav-item">
                                 <Link className="nav-link nav-light" to="/update-inventory">Items</Link>
                             </li>
+                            <li className="nav-item">
+                                <Link className="nav-link nav-light" to="/update-locations">Locations</Link>
+                            </li>
                             {decodedToken.role === 'admin' && (
                                 <>
-                                    <li className="nav-item">
-                                        <Link className="nav-link nav-light" to="/register">Add User</Link>
-                                    </li>
 
                                     <li className="nav-item">
-                                        <Link className="nav-link nav-light" to="/update-locations">Update Locations</Link>
+                                        <Link className="nav-link nav-light" to="/register">Add User</Link>
                                     </li>
                                 </>
                             )}

@@ -1,6 +1,6 @@
 // routes.js
 const sql = require('mssql');
-
+const { authenticateToken } = require('./authMiddleware');
 function setupRoutes(app, config) {
     const formatQueryParams = (params) => {
         const formattedParams = {};
@@ -60,7 +60,7 @@ function setupRoutes(app, config) {
 
     const generateUUID = require('uuid').v4;
 
-    app.get('/inventory', async (req, res) => {
+    app.get('/api/inventory', authenticateToken, async (req, res) => {
         try {
             const { filterColumn, searchValue, exactMatch } = req.query;
             let query;
@@ -79,7 +79,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.put('/inventory/:ID', async (req, res) => {
+    app.put('/api/inventory/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
             const { Name, Description, Location, Bin, Quantity, Image } = req.body;
@@ -92,7 +92,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.delete('/inventory/:ID', async (req, res) => {
+    app.delete('/api/inventory/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
             const query = `DELETE FROM Items WHERE ID = @ID`;
@@ -104,7 +104,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.post('/inventory', async (req, res) => {
+    app.post('/api/inventory', authenticateToken, async (req, res) => {
         try {
             const { Name, Description, Location, Bin, Quantity, Image } = req.body;
             const ID = generateUUID();
@@ -117,7 +117,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.get('/locations', async (req, res) => {
+    app.get('/api/locations', authenticateToken, async (req, res) => {
         try {
             const { filterColumn, searchValue, exactMatch } = req.query;
             let query;
@@ -136,7 +136,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.put('/locations/:ID', async (req, res) => {
+    app.put('/api/locations/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
             const { Name, Description, Building, Owner, Image } = req.body;
@@ -149,7 +149,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.delete('/locations/:ID', async (req, res) => {
+    app.delete('/api/locations/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
             const query = `DELETE FROM Locations WHERE ID = @ID`;
@@ -161,7 +161,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.post('/locations', async (req, res) => {
+    app.post('/api/locations', authenticateToken, async (req, res) => {
         try {
             const { Name, Description, Building, Owner } = req.body;
             const ID = generateUUID();
@@ -174,7 +174,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.get('/rooms', async (req, res) => {
+    app.get('/api/rooms', authenticateToken, async (req, res) => {
         try {
             const query = `SELECT Name, ID FROM Rooms`; // Ensure you select the necessary fields
             const result = await executeQuery(query);
@@ -184,7 +184,7 @@ function setupRoutes(app, config) {
             res.status(500).json({ error: 'Database query failed' });
         }
     });
-    app.put('/update-quantity/:id', async (req, res) => {
+    app.put('/api/update-quantity/:id', authenticateToken, async (req, res) => {
         try {
             const { quantity } = req.body;
             const { id } = req.params;
@@ -203,7 +203,7 @@ function setupRoutes(app, config) {
         }
     });
 
-    app.put('/update-out-of-stock/:id', async (req, res) => {
+    app.put('/api/update-out-of-stock/:id', authenticateToken, async (req, res) => {
         try {
             const { isOutOfStock } = req.body;
             const { id } = req.params;

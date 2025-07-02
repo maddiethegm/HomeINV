@@ -4,7 +4,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const sql = require('mssql');
 const generateUUID = require('uuid').v4;
+const { authenticateToken } = require('./authMiddleware');
+const { createRateLimiter } = require('./rateLimitMiddleware');
 
+const loginRateLimiter = createRateLimiter();
 function setupAuthRoutes(app, config) {
     const formatQueryParams = (params) => {
         const formattedParams = {};
@@ -46,7 +49,7 @@ function setupAuthRoutes(app, config) {
             });
     };
 
-    app.post('/auth/login', async (req, res) => {
+    app.post('/api/auth/login', loginRateLimiter, async (req, res) => {
         try {
             const { Username, password } = req.body;
 
@@ -96,7 +99,7 @@ function setupAuthRoutes(app, config) {
         }
     });
 
-    app.post('/auth/register', async (req, res) => {
+    app.post('/api/auth/register', authenticateToken, async (req, res) => {
         try {
             const ID = generateUUID();
             const { Username, Password, Role } = req.body;

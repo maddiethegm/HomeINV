@@ -16,11 +16,14 @@ function RoomItems() {
 
     const fetchRoomItems = async (roomName) => {
         try {
-            const response = await axios.get('http://localhost:3001/inventory', {
+            const response = await axios.get( process.env.REACT_APP_API_URL + '/inventory', {
                 params: { 
                     filterColumn: 'Location',
                     searchValue: roomName,
                     exactMatch: true
+                },
+                    headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
             setItems(response.data);

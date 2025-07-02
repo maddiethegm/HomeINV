@@ -1,5 +1,5 @@
 // src/components/InventoryList.js
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ItemCard from './ItemCard';
 
@@ -15,7 +15,7 @@ function InventoryList() {
 
     const fetchItems = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/inventory', {
+            const response = await axios.get( process.env.REACT_APP_API_URL + '/api/inventory', {
                 params: { filterColumn, searchValue, exactMatch }
             });
             setItems(response.data);

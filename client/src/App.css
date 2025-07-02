@@ -9,10 +9,17 @@ body {
 }
 
 .card {
-    background-color: #cdcdcd; /* Dark gray card background */
-    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.158); /* Glass-like effect with shadow */
+    overflow: hidden;
+    backdrop-filter: blur(30px);
+    background: hsla(0, 8%, 8%, 0);
+}
+
+.card-body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Glass-like effect with shadow */
     overflow: hidden;
+    backdrop-filter: blur(30px);
+    background: hsla(198, 13%, 20%, 0.208);
 }
 .loca-card {
     color:#000000;
@@ -35,7 +42,7 @@ body {
     backdrop-filter: blur(5px); /* Blur effect to give glass appearance */
     border-radius: 2px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.908), rgba(236, 24, 24, 0.689)); /* Gradient overlay */
+    background-image: linear-gradient(to right, rgba(147, 152, 255, 0.908), rgba(255, 96, 255, 0.689)); /* Gradient overlay */
 }
 .glassy-footer {
     background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
@@ -114,6 +121,6 @@ body {
     -webkit-text-stroke: 0.2px;
 }
 .nav-dark {
-    color:#b02a37;
-    -webkit-text-stroke: 0.3px black;
+    color:#ffffff;
+    -webkit-text-stroke: 0.3px;
 }
