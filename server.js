@@ -4,7 +4,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
 const setupRoutes = require('./routes');
-const setupAuthRoutes = require('./authRoutes');
 const app = express();
 const port = process.env.PORT || 3001;
 const cors = require('cors');
@@ -30,9 +29,7 @@ sql.connect(config, err => {
     console.log('Connected to SQL Server');
 });
 
-// server.js (continued)
 setupRoutes(app, config);
-setupAuthRoutes(app, config);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
