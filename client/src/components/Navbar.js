@@ -29,6 +29,12 @@ function Navbar() {
                             <li className="nav-item">
                                 <Link className="nav-light nav-link" to="/"></Link>
                             </li>
+                            <li>
+                                <Link className="nav-light nav-link" to="/items-report">Items Report</Link>
+                            </li>
+                            <li>
+                                <Link className="nav-light nav-link" to="/transactions-report">Transactions Report</Link>
+                            </li>
                             <li className="nav-item">
                                 <Link className="nav-link nav-light" to="/update-inventory">Items</Link>
                             </li>

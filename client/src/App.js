@@ -12,6 +12,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChangePassword from './components/ChangePassword';
+import ItemsReport from './components/reports/ItemsReport';
+import TransactionsReport from './components/reports/TransactionsReport';
 
 function App() {
     return (
@@ -21,6 +23,8 @@ function App() {
             <main className="main-content">
             <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/items-report" element={<ItemsReport />} />
+                <Route path="/transactions-report" element={<TransactionsReport />} />
                 <Route exact path="/" element={
                     <ProtectedRoute>
                         <HomePage />                        

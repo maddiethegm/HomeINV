@@ -1,6 +1,5 @@
 // src/components/UpdateLocations.js
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import LocationCard from './LocationCard'; // Import LocationCard component
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';

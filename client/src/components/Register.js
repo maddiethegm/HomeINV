@@ -12,14 +12,15 @@ function Register() {
         e.preventDefault();
         console.log('Sending data:', { Username, Password, Role }); // Add this line for debugging
         try {
-            const response = await axios.post( process.env.REACT_APP_API_URL + '/auth/register', { 
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                },
-                Username, 
-                Password, 
-                Role 
-            });
+            const response = await axios.post( 
+                process.env.REACT_APP_API_URL + '/auth/register', 
+                { Username, Password, Role },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
             console.log('Registration Response:', response.data);
             alert('Registered successfully');
             navigate('/login');
