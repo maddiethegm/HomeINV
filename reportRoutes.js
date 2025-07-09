@@ -34,7 +34,7 @@ function setupReportRoutes(app, config) {
             if (exactMatch === 'true') {
                 query = `SELECT * FROM Transactions WHERE ${filterColumn} = @searchValue`;
             } else {
-                query = `SELECT * FROM Transactions WHERE ${filterColumn} LIKE '%' + @searchValue + '%'`;
+                query = `SELECT TOP 100 * FROM Transactions WHERE ${filterColumn} LIKE '%' + @searchValue + '%' ORDER BY Timestamp DESC`;
             }
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });

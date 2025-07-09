@@ -1,24 +1,33 @@
 // src/Components/Reports/ItemsReport.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
+import ItemCard from '../ItemCard'; // Assuming you have a common ItemCard component
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ItemsReport = () => {
-    const [items, setItems] = useState([]);
+    const [inventoryItem, setInventoryItem] = useState({
+        ID: '',
+        Name: '',
+        Description: '',
+        LocationID: '', // Use LocationID for database operations
+        LocationName: '', // Displayed in the dropdown
+        Bin: '',
+        Quantity: 0,
+        Image: ''
+    });
     const [filterColumn, setFilterColumn] = useState('');
     const [searchValue, setSearchValue] = useState('');
     const [exactMatch, setExactMatch] = useState(false);
-
-    useEffect(() => {
-        fetchItems();
-    }, []);
-
+    const [locations, setLocations] = useState([]);
+    const [items, setItems] = useState([]);
+    const navigate = useNavigate();
+    const location = useLocation();
     const fetchItems = async () => {
         try {
-            const response = await axios.get('/api/reports/items', {
-                params: {
-                    filterColumn,
-                    searchValue,
-                    exactMatch
+            const response = await api.get('/reports/items', {
+                params: { filterColumn, searchValue, exactMatch },
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
             setItems(response.data);
@@ -27,65 +36,80 @@ const ItemsReport = () => {
         }
     };
 
+    useEffect(() => {
+        // Initialize inventoryItem with data from route state if available
+        if (location.state) {
+            setInventoryItem(location.state);
+        }
+
+//        fetchLocations();
+        fetchItems();
+    }, [location]);
+    const handleSearch = async () => {
+        await fetchItems();
+    };
+
+    const handleClearFilters = () => {
+        setFilterColumn('');
+        setSearchValue('');
+        setExactMatch(false);
+        fetchItems(); // Refetch with cleared filters
+    };
+
     return (
-        <div>
+        <div className="container mt-5">
             <h2>Items Report</h2>
-            <div>
-                <label htmlFor="filterColumn">Filter Column:</label>
-                <input
-                    type="text"
-                    id="filterColumn"
-                    value={filterColumn}
-                    onChange={(e) => setFilterColumn(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="searchValue">Search Value:</label>
-                <input
-                    type="text"
-                    id="searchValue"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="exactMatch">
+            
+            {/* Search Filters */}
+            <div className="d-flex mb-3">
+                <div className="me-3">
+                    <label htmlFor="filterColumn" className="form-label">Filter Column:</label>
                     <input
-                        type="checkbox"
-                        id="exactMatch"
-                        checked={exactMatch}
-                        onChange={(e) => setExactMatch(e.target.checked)}
+                        type="text"
+                        id="filterColumn"
+                        value={filterColumn}
+//                        onChange={(e) => setFilterColumn(e.target.value)}
+                        className="form-control"
                     />
-                    Exact Match
-                </label>
+                </div>
+                <div className="me-3">
+                    <label htmlFor="searchValue" className="form-label">Search Value:</label>
+                    <input
+                        type="text"
+                        id="searchValue"
+                        value={searchValue}
+//                        onChange={(e) => setSearchValue(e.target.value)}
+                        className="form-control"
+                    />
+                </div>
+                <div className="me-3">
+                    <label htmlFor="exactMatch" className="form-label">
+                        <input
+                            type="checkbox"
+                            id="exactMatch"
+                            checked={exactMatch}
+                            onChange={(e) => setExactMatch(e.target.checked)}
+                        />{' '}
+                        Exact Match
+                    </label>
+                </div>
+                <button className="btn btn-primary me-2" onClick={handleSearch}>Search</button>
+                <button className="btn btn-secondary" onClick={handleClearFilters}>Clear Filters</button>
             </div>
-            <button onClick={fetchItems}>Fetch Items</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Location</th>
-                        <th>Bin</th>
-                        <th>Quantity</th>
-                        <th>Image</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {items.map((item) => (
-                        <tr key={item.ID}>
-                            <td>{item.ID}</td>
-                            <td>{item.Name}</td>
-                            <td>{item.Description}</td>
-                            <td>{item.Location}</td>
-                            <td>{item.Bin}</td>
-                            <td>{item.Quantity}</td>
-                            <td>{item.Image ? <img src={item.Image} alt="Item" width="50" /> : null}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+
+            {/* Items Grid */}
+            <div className="row row-cols-1 row-cols-md-3 g-4">
+                {items.map(item => (
+                    <div key={item.ID} className="col">
+                        <ItemCard item={item} onModify={() => navigate(`/update`, { state: item, replace: true })} />
+                    </div>
+                ))}
+            </div>
+
+            {/* No Results Message */}
+            {!items.length && (
+                <p>No items found.</p>
+            )}
         </div>
     );
 };
