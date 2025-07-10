@@ -1,7 +1,5 @@
 // src/components/Navbar.js
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
 function Navbar() {
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
@@ -22,26 +20,32 @@ function Navbar() {
     };
 
     return (
-        <nav className="navbar navbar-expand-lg ">
+        <nav className="navbar glassy-navbar navbar-expand-lg ">
             <div className="container-fluid">
-                <Link className="navbar-brand" to="/">Inventory App</Link>
+                <Link className="navbar-brand nav-dark" to="/">Inventory Home</Link>
                 {token && decodedToken ? (
                     <>
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                        <ul className="navbar-nav me-auto mb-2 mb-lg-0 nav-light">
                             <li className="nav-item">
-                                <Link className="nav-link" to="/"></Link>
+                                <Link className="nav-light nav-link" to="/"></Link>
+                            </li>
+                            <li>
+                                <Link className="nav-light nav-link" to="/items-report">Items Report</Link>
+                            </li>
+                            <li>
+                                <Link className="nav-light nav-link" to="/transactions-report">Transactions Report</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link" to="/update-inventory">Items</Link>
+                                <Link className="nav-link nav-light" to="/update-inventory">Items</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link className="nav-link nav-light" to="/update-locations">Locations</Link>
                             </li>
                             {decodedToken.role === 'admin' && (
                                 <>
-                                    <li className="nav-item">
-                                        <Link className="nav-link" to="/register">Add User</Link>
-                                    </li>
 
                                     <li className="nav-item">
-                                        <Link className="nav-link" to="/update-locations">Update Locations</Link>
+                                        <Link className="nav-link nav-light" to="/register">Add User</Link>
                                     </li>
                                 </>
                             )}

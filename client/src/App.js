@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useEffect } from 'react';
+//import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import InventoryList from './components/InventoryList';
 import HomePage from './components/HomePage';
@@ -11,42 +11,50 @@ import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-
+import ChangePassword from './components/ChangePassword';
+import ItemsReport from './components/reports/ItemsReport';
+import TransactionsReport from './components/reports/TransactionsReport';
 
 function App() {
-//    useEffect(() => {
-//        const socket = require('socket.io-client')('http://localhost:3001'); // Replace with your server URL
-//
-//        socket.on('connect', () => {
-//            console.log(`Connected to socket server`);
-//        });
-//
-//        socket.on('itemUpdated', (data) => {
-//            console.log('Item updated:', data);
-//            // You can refresh the list or update specific items here
-//            // For example, you could dispatch a Redux action or update the component state
-//        });
-//
-//        return () => {
-//            socket.disconnect();
-//        };
-//    }, []);
     return (
         <Router>
             <div className="app-container">
             <Navbar />
             <main className="main-content">
             <Routes>
-                <Route exact path="/" element={<HomePage />} />
-                <Route path="/inventory-list" element={<InventoryList />} />
-                <Route path="/update-inventory" element={<UpdateInventory />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/items-report" element={<ItemsReport />} />
+                <Route path="/transactions-report" element={<TransactionsReport />} />
+                <Route exact path="/" element={
+                    <ProtectedRoute>
+                        <HomePage />                        
+                    </ProtectedRoute>
+                } />
+                <Route path="/inventory-list" element={
+                    <ProtectedRoute>
+                        <InventoryList />                        
+                    </ProtectedRoute>
+                } />
+                <Route path="/update-inventory" element={
+                    <ProtectedRoute>
+                        <UpdateInventory />                        
+                    </ProtectedRoute>
+                } />
                 <Route path="/update-locations" element={
                     <ProtectedRoute>
                         <UpdateLocations />                        
                     </ProtectedRoute>
                 } />
-                <Route path="/items/:roomName" element={<RoomItems />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/change-password" element={
+                    <ProtectedRoute>
+                        <ChangePassword />                        
+                    </ProtectedRoute>
+                } />
+                <Route path="/items/:roomName" element={
+                    <ProtectedRoute>
+                        <RoomItems />                        
+                    </ProtectedRoute>
+                } />
                 <Route path="/register" element={
                     <ProtectedRoute role="admin">
                         <Register />

@@ -3,13 +3,13 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
-const setupRoutes = require('./routes');
-const setupSocketRoutes = require('./socketRoutes');
-const setupAuthRoutes = require('./authRoutes');
+//const setupRoutes = require('./routes');
 const app = express();
 const port = process.env.PORT || 3001;
 const cors = require('cors');
-
+const setupAuthRoutes = require('./authRoutes')
+const setupInvRoutes = require('./invRoutes')
+const setupReportRoutes = require('./reportRoutes')
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 app.use(cors());
@@ -31,31 +31,10 @@ sql.connect(config, err => {
     console.log('Connected to SQL Server');
 });
 
-// Socket.IO setup
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
-
-let connectedClients = new Set();
-
-io.on('connection', (socket) => {
-    console.log(`Socket connected: ${socket.id}`);
-    connectedClients.add(socket.id);
-
-    socket.on('disconnect', () => {
-        console.log(`Socket disconnected: ${socket.id}`);
-        connectedClients.delete(socket.id);
-    });
-
-    // Emit an event to notify all clients about changes
-    const notifyAllClients = (event, data) => {
-        io.emit(event, data);
-    };
-    setupSocketRoutes(app, config);
-});
-
-// server.js (continued)
-setupRoutes(app, config);
-setupAuthRoutes(app, config);
+//setupRoutes(app, config);
+setupAuthRoutes(app);
+setupInvRoutes(app);
+setupReportRoutes(app);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

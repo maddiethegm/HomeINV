@@ -15,7 +15,7 @@ function InventoryList() {
 
     const fetchItems = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/inventory', {
+            const response = await axios.get( process.env.REACT_APP_API_URL + '/api/inventory', {
                 params: { filterColumn, searchValue, exactMatch }
             });
             setItems(response.data);

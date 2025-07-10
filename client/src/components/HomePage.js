@@ -1,5 +1,5 @@
 // src/components/HomePage.js
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,11 +14,14 @@ function HomePage() {
 
 const fetchRooms = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/locations', {
+            const response = await axios.get( process.env.REACT_APP_API_URL + '/locations', {
                 params: { 
                     filterColumn: 'Name',
-                    searchValue: ' ',
+                    searchValue: '',
                     exactMatch: false
+                },
+                    headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
             setRooms(response.data);
@@ -34,7 +37,6 @@ const fetchRooms = async () => {
 
     return (
         <div className="container mt-5">
-            <h2>Storage Locations</h2>
             <div className="row row-cols-1 row-cols-md-3 g-4">
                 {rooms.map(room => (
                     <div key={room.ID} className="col">
