@@ -18,7 +18,9 @@ function setupInvRoutes(app, config) {
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });
             res.json(result.recordset);
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            if (process.env.LOGGING === 'high') {
+                logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            }
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });
@@ -32,7 +34,7 @@ function setupInvRoutes(app, config) {
             const query = `UPDATE Items SET Name = @Name, Description = @Description, Location = @Location, Bin = @Bin, Quantity = @Quantity, Image = @Image WHERE ID = @ID`;
             await executeQuery(config, query, { ID, Name, Description, Location, Bin, Quantity, Image });
             res.json({ success: true });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database update failed' });
@@ -45,7 +47,7 @@ function setupInvRoutes(app, config) {
             const query = `DELETE FROM Items WHERE ID = @ID`;
             await executeQuery(config, query, { ID });
             res.json({ success: true });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, `delete ${ID}`, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database deletion failed' });
@@ -59,7 +61,7 @@ function setupInvRoutes(app, config) {
             const query = `INSERT INTO Items (ID, Name, Description, Location, Bin, Quantity, Image) VALUES (@ID, @Name, @Description, @Location, @Bin, @Quantity, @Image)`;
             await executeQuery(config, query, { ID, Name, Description, Location, Bin, Quantity, Image });
             res.status(201).json({ success: true });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null); // Use req.body here
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database insertion failed' });
@@ -79,7 +81,9 @@ function setupInvRoutes(app, config) {
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });
             res.json(result.recordset);
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            if (process.env.LOGGING === 'high') {
+                logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            }
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });
@@ -93,7 +97,7 @@ function setupInvRoutes(app, config) {
             const query = `UPDATE Locations SET Name = @Name, Description = @Description, Building = @Building, Owner = @Owner, Image = @Image WHERE ID = @ID`;
             await executeQuery(config, query, { ID, Name, Description, Building, Owner, Image });
             res.json({ success: true });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database update failed' });
@@ -106,7 +110,7 @@ function setupInvRoutes(app, config) {
             const query = `DELETE FROM Locations WHERE ID = @ID`;
             await executeQuery(config, query, { ID });
             res.json({ success: true });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, `delete ${ID}`, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database deletion failed' });
@@ -120,7 +124,7 @@ function setupInvRoutes(app, config) {
             const query = `INSERT INTO Locations (ID, Name, Description, Building, Owner) VALUES (@ID, @Name, @Description, @Building, @Owner)`;
             await executeQuery(config, query, { ID, Name, Description, Building, Owner });
             res.status(201).json({ success: true });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database insertion failed' });
@@ -132,7 +136,9 @@ function setupInvRoutes(app, config) {
             const query = `SELECT Name, ID FROM Rooms`; // Ensure you select the necessary fields
             const result = await executeQuery(config, query);
             res.json(result.recordset);
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            if (process.env.LOGGING === 'high') {
+                logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            }
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });
@@ -148,7 +154,7 @@ function setupInvRoutes(app, config) {
             await executeQuery(config, queryUpdateQuantity, { ID: id, Quantity: quantity });
 
             res.json({ message: 'Quantity updated successfully' });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
             if (err.code === 'EREQUEST') {
                 console.error('Database query failed:', err.originalError.info.message);
@@ -168,7 +174,7 @@ function setupInvRoutes(app, config) {
             await executeQuery(config, queryUpdateOutofStock, { ID: id, IsOutOfStock: isOutOfStock });
 
             res.json({ message: 'Out of Stock status updated successfully' });
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
             if (err.code === 'EREQUEST') {
                 console.error('Database query failed:', err.originalError.info.message);

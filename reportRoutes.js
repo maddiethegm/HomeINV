@@ -2,7 +2,7 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const { authenticateToken } = require('./authMiddleware');
-const { executeQuery } = require('./dbquery');
+const { executeQuery, logTransaction } = require('./dbquery');
 
 function setupReportRoutes(app, config) {
     app.get('/api/reports/items', authenticateToken, async (req, res) => {
@@ -18,8 +18,15 @@ function setupReportRoutes(app, config) {
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });
             res.json(result.recordset);
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
 
+            // Log the transaction after sending the response
+            try {
+                    if (process.env.LOGGING === 'high') {
+                        logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+                    }            
+                } catch (logErr) {
+                console.error("Error logging transaction:", logErr);
+            }
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });
@@ -39,7 +46,15 @@ function setupReportRoutes(app, config) {
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });
             res.json(result.recordset);
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+
+            // Log the transaction after sending the response
+            try {
+                    if (process.env.LOGGING === 'high') {
+                        logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+                    }            
+                } catch (logErr) {
+                console.error("Error logging transaction:", logErr);
+            }
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });

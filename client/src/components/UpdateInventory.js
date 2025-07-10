@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import ItemCard from './ItemCard'; // Ensure this component is imported correctly
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';

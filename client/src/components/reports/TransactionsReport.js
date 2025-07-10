@@ -59,60 +59,81 @@ const TransactionsReport = () => {
         FileSaver.saveAs(blob, "transactions_report.csv");
     };
 
-    // Function to export transactions as PDF
-const exportAsPDF = () => {
+const exportAsPDF = async () => {
     if (!transactions || transactions.length === 0) return;
+
+    const pageHeight = 297; // A4 paper height (mm)
+    const pageWidth = 210; // A4 paper width (mm)
+
+    const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        putOnlyUsedFonts: true,
+        compressPdfFonts: true
+    });
+
+    // Assuming each row takes about 6mm vertically (adjust as necessary)
+    const rowHeight = 8;
+    const rowsPerPage = Math.floor(pageHeight / rowHeight);
+
+    for (let i = 0; i < transactions.length; i += rowsPerPage) {
+        const pageTransactions = transactions.slice(i, i + rowsPerPage);
+
+        // Render only the current subset of data
         const tableElement = document.querySelector("#transactions-table");
-    if (!tableElement) {
-        console.error("Table element not found");
-        return;
-    }
-    // Log transactions to ensure they are present
-    console.log('Transactions:', transactions);
-
-    html2canvas(document.querySelector("#transactions-table"), {
-        scrollY: -window.scrollY,
-        scale: 2,
-        logging: true, // Enable logging for debugging
-        useCORS: true // Ensure CORS issues don't cause problems
-    }).then(canvas => {
-        console.log('Canvas generated:', canvas); // Log the canvas element
-
-        // Check if the canvas is valid and has a width and height
-        if (!canvas || !canvas.width || !canvas.height) {
-            throw new Error('Invalid canvas or dimensions');
+        const tableClone = tableElement.cloneNode(true); // Clone the original table
+        const tbody = tableClone.querySelector('tbody');
+        
+        // Remove all existing rows from the cloned table's body
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
         }
 
-        const imgData = canvas.toDataURL('image/png');
+        // Append only the current subset of transactions to the cloned table's body
+        pageTransactions.forEach((transaction, index) => {
+            const row = document.createElement('tr');
 
-        // Debug statement to check the Data URL
-        console.log('Image Data URL:', imgData);
-
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4',
-            putOnlyUsedFonts: true,
-            compressPdfFonts: true
+            row.innerHTML = `
+                <td style=>${transaction.ID}</td>
+                <td style=>${transaction.Route}</td>
+                <td style="width: 210px; white-space: normal;">
+                    <pre style="white-space: pre-wrap; word-wrap: break-word; overflow: hidden; text-overflow: ellipsis; max-height: 80px;">${JSON.stringify(transaction.RequestPayload, null, 2)}</pre>
+                </td>
+                <td style=>${transaction.Timestamp}</td>
+                <td style=>${transaction.AuthenticatedUsername}</td>
+            `;
+            
+            tbody.appendChild(row);
         });
 
-        // Log image properties before adding to PDF
-        console.log('Image Properties:', pdf.getImageProperties(imgData));
+        // Add the cloned table to a container and make it visible
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.top = '-10000px'; // Off-screen positioning
+        tempContainer.style.left = '-10000px';
 
-        const imgProps = pdf.getImageProperties(imgData);
-        if (!imgProps.width || !imgProps.height) {
-            throw new Error('Invalid image properties');
+        tempContainer.appendChild(tableClone);
+        document.body.appendChild(tempContainer);
+
+        await html2canvas(tempContainer, { scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            pdf.addImage(imgData, 'PNG', 5, 5, pageWidth - 10, (pageHeight - 10) * (canvas.height / canvas.width));
+        });
+
+        // Remove the temporary container
+        document.body.removeChild(tempContainer);
+
+        if ((i + rowsPerPage) < transactions.length) {
+            pdf.addPage();
         }
+    }
 
-        const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
-        pdf.save("transactions_report.pdf");
-    }).catch(err => {
-        console.error('Error generating canvas:', err); // Log any errors during canvas generation
-    });
+    pdf.save("transactions_report.pdf");
 };
+
+
+
 
 
     return (
