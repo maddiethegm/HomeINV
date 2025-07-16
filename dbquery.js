@@ -28,7 +28,7 @@ async function formatQueryParams(params) {
             formattedParams[key] = { type: sql.UniqueIdentifier, value: params[key] };
         } else if (['Name', 'Description', 'Building', 'Owner', 'Role', 'Location', 'Route'].includes(key)) {
             formattedParams[key] = { type: sql.NVarChar(255), value: params[key] };
-        } else if (key === 'Username') {
+        } else if (key === 'Username', 'AuthenticatedUsername') {
             formattedParams[key] = { type: sql.NVarChar(50), value: params[key].toLowerCase() }; // Normalize to lowercase
         } else if (['PasswordHash', 'Image'].includes(key)) {
             formattedParams[key] = { type: sql.NVarChar(sql.MAX), value: params[key] };
@@ -160,7 +160,7 @@ async function logTransaction(config, route, requestPayload, authenticatedUserna
             ID: ID,
             Route: route,
             RequestPayload: JSON.stringify(requestPayload),
-            AuthenticatedUsername: authenticatedUsername
+            AuthenticatedUsername: authenticatedUsername || 'none'
         };
         await executeQuery(config, query, params);
     } catch (err) {

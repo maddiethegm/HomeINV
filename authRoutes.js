@@ -172,10 +172,7 @@ function setupAuthRoutes(app, config) {
                 console.error('LDAP authentication error:', ldapError);
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
-            logTransaction(config, req.route.path, 'login', req.user ? req.user.Username : null);            
-            if (resultCheck.recordset.length > 0) {
-                return res.status(409).json({ error: 'User already exists' });
-            }
+            logTransaction(config, req.route.path, req.body.Username, req.body.username);            
         } catch (err) {
             if (err.code === 'EREQUEST') {
                 console.error('Database query failed:', err.originalError.info.message);
