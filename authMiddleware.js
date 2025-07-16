@@ -6,7 +6,7 @@ require('dotenv').config();
  * Secret key for JWT verification.
  * @type {string}
  */
-const secretKey = process.env.JWT_SECRET; // Replace with your secret key
+const secretKey = process.env.JWT_SECRET;
 
 /**
  * Middleware to authenticate a user using JWT token.
@@ -45,7 +45,7 @@ function authenticateToken(req, res, next) {
  */
 function authorizeRole(requiredRole) {
     /**
-     * Inner middleware function to check the user's role.
+     * Inner function to check the user's role.
      *
      * @inner
      * @function

@@ -7,10 +7,10 @@ const { authenticate } = require('ldap-authentication');
 const generateUUID = require('uuid').v4;
 const { authenticateToken } = require('./authMiddleware');
 const { createRateLimiter } = require('./rateLimitMiddleware');
-const { executeQuery } = require('./dbquery');
+const { executeQuery, logTransaction } = require('./dbquery');
 const loginRateLimiter = createRateLimiter();
 
-// tk This is the worst version of LDAP authentication, do better
+// This is the worst version of LDAP authentication, do better
 /**
  * Authenticates a user using LDAP.
  *
@@ -44,7 +44,7 @@ async function authenticateLDAP(username, password) {
  * Sets up authentication routes for app.
  *
  * @param {import('express').Application} app - The Express application object.
- * @param {object} config - Configuration settings for the database connection.
+ * @param {object} config - Configuration settings defined in server.js.
  */
 function setupAuthRoutes(app, config) {
     /**
@@ -145,9 +145,8 @@ function setupAuthRoutes(app, config) {
                     role: user.Role
                 };
 
-// Write a renew token function in authMiddleware.js so that you can set this back to 1h
-                const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
-
+                // Specify token expiry duration in TOKEN_EXPIRY variable
+                const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.TOKEN_EXPIRY || '1h' });
                 console.log('Login successful for username:', normalizedUsername);
                 return res.json({ token });
             }
@@ -165,9 +164,7 @@ function setupAuthRoutes(app, config) {
                     Username: user.Username,
                     role: user.Role
                 };
-
                 const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
                 console.log('Login successful for username:', normalizedUsername);
                 res.json({ token });
 
@@ -175,7 +172,10 @@ function setupAuthRoutes(app, config) {
                 console.error('LDAP authentication error:', ldapError);
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
-
+            logTransaction(config, req.route.path, 'login', req.user ? req.user.Username : null);            
+            if (resultCheck.recordset.length > 0) {
+                return res.status(409).json({ error: 'User already exists' });
+            }
         } catch (err) {
             if (err.code === 'EREQUEST') {
                 console.error('Database query failed:', err.originalError.info.message);

@@ -1,5 +1,5 @@
 // src/components/ChangePassword.js
-
+// This component is broken and unused but left in place as a reminder to fix it
 /**
  * React component for changing user password.
  */

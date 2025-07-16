@@ -35,10 +35,10 @@ app.use(cors({
 
 // SQL Server Configuration
 const config = {
-    user: process.env.SQL_USER,
-    password: process.env.SQL_PASSWORD,
-    server: process.env.SQL_SERVER,
-    database: process.env.SQL_DATABASE,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_DATABASE,
     options: {
         encrypt: false,
         trustServerCertificate: true,

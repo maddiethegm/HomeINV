@@ -14,7 +14,9 @@ const { executeQuery, logTransaction } = require('./dbquery');
 function setupReportRoutes(app, config) {
     /**
      * Route to get items based on query parameters.
-     *
+     * 
+     * Because this function doesn't write anything, we only log the transaction if LOGGING=high
+     * 
      * @route GET /api/reports/items
      * @param {string} req.query.filterColumn - The column to filter by.
      * @param {string} req.query.searchValue - The value to search for.
@@ -50,7 +52,9 @@ function setupReportRoutes(app, config) {
 
     /**
      * Route to get transactions based on query parameters.
-     *
+     * 
+     * Because this function doesn't write anything, we only log the transaction if LOGGING=high
+     * 
      * @route GET /api/reports/transactions
      * @param {string} req.query.filterColumn - The column to filter by.
      * @param {string} req.query.searchValue - The value to search for.

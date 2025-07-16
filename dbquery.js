@@ -1,7 +1,4 @@
-/**
- * @file dbquery.js
- * @description Database query execution module.
- */
+// dbquery.js
 
 require('dotenv').config();
 const generateUUID = require('uuid').v4;
@@ -12,12 +9,14 @@ const { Client } = require('pg');
 
 /**
  * Database type configuration from environment variable.
+ * Default to MSSQL server because that's what's used in development.
  * @type {string}
  */
 const DB_TYPE = process.env.DB_TYPE || 'MSSQL';
 
 /**
  * Formats query parameters based on their keys and types.
+ * This should be neatened up but it works for now so ¯\_(ツ)_/¯
  *
  * @param {Object} params - An object containing the parameters to format.
  * @returns {Promise<Object>} A promise that resolves with formatted parameters.
@@ -143,6 +142,7 @@ async function executeQuery(config, query, params) {
 
 /**
  * Logs a transaction to the database.
+ * This should be broken out to a separate file. It's on the to-do list at the same time as adding detailed logging to a local log in .txt or .csv format
  *
  * @param {Object} config - Database configuration object.
  * @param {string} route - The API route that was called.

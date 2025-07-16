@@ -14,6 +14,7 @@ const { authenticateToken } = require('./authMiddleware');
 function setupInvRoutes(app, config) {
     /**
      * Route to get inventory items based on query parameters.
+     * Next up to-do: filter by multiple columns
      *
      * @route GET /api/inventory
      * @param {string} req.query.filterColumn - The column to filter by.
@@ -194,6 +195,8 @@ function setupInvRoutes(app, config) {
 
     /**
      * Route to get rooms.
+     * Rooms are the same as locations. I wrote these routes for the home page with the initial intention of adding rooms 
+     * as groups of locations, but that functionality has not been added.
      *
      * @route GET /api/rooms
      */
@@ -213,6 +216,7 @@ function setupInvRoutes(app, config) {
 
     /**
      * Route to update the quantity of an item.
+     * This route is used for the item card "update quantity" button
      *
      * @route PUT /api/update-quantity/:id
      * @param {string} req.params.id - The ID of the item to update.
@@ -235,33 +239,6 @@ function setupInvRoutes(app, config) {
             }
             console.error('Update quantity error:', err);
             res.status(500).json({ error: 'Failed to update quantity' });
-        }
-    });
-
-    /**
-     * Route to update the out-of-stock status of an item.
-     *
-     * @route PUT /api/update-out-of-stock/:id
-     * @param {string} req.params.id - The ID of the item to update.
-     * @param {boolean} req.body.isOutOfStock - The new out-of-stock status.
-     */
-    app.put('/api/update-out-of-stock/:id', authenticateToken, async (req, res) => {
-        try {
-            const { isOutOfStock } = req.body;
-            const { id } = req.params;
-
-            const queryUpdateOutofStock = `UPDATE Items SET IsOutOfStock = @IsOutOfStock WHERE ID = @ID`;
-            await executeQuery(config, queryUpdateOutofStock, { ID: id, IsOutOfStock: isOutOfStock });
-
-            res.json({ message: 'Out of Stock status updated successfully' });
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
-        } catch (err) {
-            if (err.code === 'EREQUEST') {
-                console.error('Database query failed:', err.originalError.info.message);
-                return res.status(500).json({ error: 'Database query failed' });
-            }
-            console.error('Update out-of-stock error:', err);
-            res.status(500).json({ error: 'Failed to update out-of-stock status' });
         }
     });
 }
