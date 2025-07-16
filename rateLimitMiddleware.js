@@ -1,9 +1,21 @@
 // rateLimitMiddleware.js
+/**
+ *
+ * Middleware module to limit the number of requests from a single IP.
+ */
 const rateLimit = require('express-rate-limit');
 
-// Function to create rate limiters
+/**
+ * Creates and returns a rate limiter middleware.
+ *
+ * @returns {function} The rate limiter middleware function.
+ */
 function createRateLimiter() {
-    return rateLimit({
+    /**
+     * Rate limiting options.
+     * @type {Object}
+     */
+    const rateLimiterOptions = {
         windowMs: 60 * 1000, // 1 minute
         max: 10, // Limit each IP to 10 requests per `window` (here, per 1 minute)
         message: {
@@ -16,7 +28,14 @@ function createRateLimiter() {
                 message: "Too many requests. Try again later."
             });
         }
-    });
+    };
+
+    /**
+     * Returns the rate limiter middleware.
+     * @type {function}
+     */
+    return rateLimit(rateLimiterOptions);
 }
 
 module.exports = { createRateLimiter };
+

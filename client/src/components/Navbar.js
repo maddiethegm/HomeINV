@@ -1,5 +1,16 @@
 // src/components/Navbar.js
+
+/**
+ * React component for the navigation bar.
+ * It displays different links based on whether a user is authenticated or not.
+ */
 import { Link, useNavigate } from 'react-router-dom';
+
+/**
+ * Navbar component.
+ *
+ * @returns {JSX.Element} - The JSX element representing the navigation bar.
+ */
 function Navbar() {
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
@@ -14,13 +25,16 @@ function Navbar() {
         }
     }
 
+    /**
+     * Handles user logout by removing the token from local storage and navigating to the login page.
+     */
     const handleLogout = () => {
         localStorage.removeItem('token');
         navigate('/login');
     };
 
     return (
-        <nav className="navbar glassy-navbar navbar-expand-lg ">
+        <nav className="navbar glassy-navbar navbar-expand-lg">
             <div className="container-fluid">
                 <Link className="navbar-brand nav-dark" to="/">Inventory Home</Link>
                 {token && decodedToken ? (
@@ -43,7 +57,6 @@ function Navbar() {
                             </li>
                             {decodedToken.role === 'admin' && (
                                 <>
-
                                     <li className="nav-item">
                                         <Link className="nav-link nav-light" to="/register">Add User</Link>
                                     </li>
@@ -58,7 +71,7 @@ function Navbar() {
                             <Link className="nav-link" to="/login">Login</Link>
                         </li>
                         <li className="nav-item">
-                        <Link className="nav-link" to="/inventory-list">Inventory Search</Link>
+                            <Link className="nav-link" to="/inventory-list">Inventory Search</Link>
                         </li>
                     </ul>
                 )}

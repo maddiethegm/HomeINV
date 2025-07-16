@@ -1,28 +1,48 @@
 // src/components/RoomItems.js
+
+/**
+ * React component that displays items for a specific room.
+ * It fetches items from an API and renders them using ItemCard components.
+ */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import ItemCard from './ItemCard';
 
+/**
+ * RoomItems component.
+ *
+ * @returns {JSX.Element} - The JSX element representing the list of items in a specific room.
+ */
 function RoomItems() {
     const { roomName } = useParams();
     const [items, setItems] = useState([]);
     const navigate = useNavigate();
 
+    /**
+     * useEffect hook to fetch items for the selected room when the component mounts.
+     *
+     * @param {string} roomName - The name of the room to fetch items for.
+     */
     useEffect(() => {
         // Fetch items for the selected room when the component mounts
         fetchRoomItems(roomName);
     }, [roomName]);
 
+    /**
+     * Function to fetch items from the API based on the provided room name.
+     *
+     * @param {string} roomName - The name of the room to filter items by.
+     */
     const fetchRoomItems = async (roomName) => {
         try {
-            const response = await axios.get( process.env.REACT_APP_API_URL + '/inventory', {
+            const response = await axios.get(process.env.REACT_APP_API_URL + '/inventory', {
                 params: { 
                     filterColumn: 'Location',
                     searchValue: roomName,
                     exactMatch: true
                 },
-                    headers: {
+                headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
@@ -32,6 +52,10 @@ function RoomItems() {
         }
     };
 
+    /**
+     * Function to handle the back button click.
+     * Navigates the user back to the home page.
+     */
     const handleBackClick = () => {
         navigate('/');
     };

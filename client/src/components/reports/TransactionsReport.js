@@ -12,10 +12,7 @@ const TransactionsReport = () => {
     const [searchValue, setSearchValue] = useState('');
     const [exactMatch, setExactMatch] = useState(false);
     const [loading, setLoading] = useState(true); // Add a loading state
-
-    useEffect(() => {
-        fetchTransactions();
-    }, []);
+    const [exportProgress, setExportProgress] = useState(0); // New progress state
 
     const fetchTransactions = async () => {
         try {
@@ -36,6 +33,10 @@ const TransactionsReport = () => {
             setLoading(false); // Ensure loading is set to false in case of error
         }
     };
+
+    useEffect(() => {
+        fetchTransactions();
+    }, [filterColumn, searchValue, exactMatch]);
 
     // Function to export transactions as CSV
     const exportAsCSV = () => {
@@ -61,7 +62,8 @@ const TransactionsReport = () => {
 
 const exportAsPDF = async () => {
     if (!transactions || transactions.length === 0) return;
-
+    setExportProgress(0); // Reset progress when starting the export
+    let currentProgress = exportProgress;
     const pageHeight = 297; // A4 paper height (mm)
     const pageWidth = 210; // A4 paper width (mm)
 
@@ -76,7 +78,6 @@ const exportAsPDF = async () => {
     // Assuming each row takes about 6mm vertically (adjust as necessary)
     const rowHeight = 8;
     const rowsPerPage = Math.floor(pageHeight / rowHeight);
-
     for (let i = 0; i < transactions.length; i += rowsPerPage) {
         const pageTransactions = transactions.slice(i, i + rowsPerPage);
 
@@ -116,25 +117,21 @@ const exportAsPDF = async () => {
         tempContainer.appendChild(tableClone);
         document.body.appendChild(tempContainer);
 
-        await html2canvas(tempContainer, { scale: 2 }).then(canvas => {
+        await html2canvas(tempContainer, { scale: .8 }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
             pdf.addImage(imgData, 'PNG', 5, 5, pageWidth - 10, (pageHeight - 10) * (canvas.height / canvas.width));
         });
-
+        currentProgress += 5;
         // Remove the temporary container
         document.body.removeChild(tempContainer);
-
+        setExportProgress(currentProgress);
         if ((i + rowsPerPage) < transactions.length) {
             pdf.addPage();
         }
     }
-
+    setExportProgress(100); // Finalize progress at 100%
     pdf.save("transactions_report.pdf");
 };
-
-
-
-
 
     return (
         <div className="container">
@@ -174,7 +171,14 @@ const exportAsPDF = async () => {
             <button onClick={exportAsPDF} disabled={loading || transactions.length === 0} className="btn btn-danger mb-3">
                 Export as PDF
             </button>
-
+            {/* Loading bar */}
+            {loading ? (
+                <div className="progress mt-3">
+                    <div className="progress-bar" role="progressbar" style={{ width: `${exportProgress}%` }} aria-valuenow={exportProgress} aria-valuemin="0" aria-valuemax="100">
+                        {Math.round(exportProgress)}%
+                    </div>
+                </div>
+            ) : null}
             {/* Scrollable table container */}
             <div className="overflow-auto" style={{ maxHeight: '400px' }} id="transactions-table-container">
                 {loading ? (

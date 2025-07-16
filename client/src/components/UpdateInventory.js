@@ -3,7 +3,14 @@ import ItemCard from './ItemCard'; // Ensure this component is imported correctl
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
+/**
+ * UpdateInventory component for managing inventory items.
+ * This component allows users to update, add, and delete inventory items.
+ */
 function UpdateInventory() {
+    /**
+     * State to hold the current inventory item being edited or added.
+     */
     const [inventoryItem, setInventoryItem] = useState({
         ID: '',
         Name: '',
@@ -15,13 +22,41 @@ function UpdateInventory() {
         Image: ''
     });
 
+    /**
+     * State to hold all available locations.
+     */
     const [locations, setLocations] = useState([]);
+
+    /**
+     * State to hold all items fetched from the server.
+     */
     const [items, setItems] = useState([]); // State to hold all items
+
+    /**
+     * State to hold search results for inventory items.
+     */
     const [searchResults, setSearchResults] = useState([]);
+
+    /**
+     * State to control visibility of the search modal.
+     */
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+    /**
+     * React Router location hook to access route parameters and state.
+     */
     const location = useLocation();
+
+    /**
+     * React Router navigate hook for programmatically navigating routes.
+     */
     const navigate = useNavigate();
 
+    /**
+     * useEffect to initialize the component.
+     * - Sets initial inventory item from location state if available.
+     * - Fetches locations and items on component mount.
+     */
     useEffect(() => {
         if (location.state) {
             setInventoryItem(location.state);
@@ -31,6 +66,9 @@ function UpdateInventory() {
         fetchItems();
     }, [location]);
 
+    /**
+     * Fetches all locations from the server and updates the `locations` state.
+     */
     const fetchLocations = async () => {
         try {
             const response = await api.get('/locations', {
@@ -49,6 +87,9 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Fetches all inventory items from the server and updates the `items` state.
+     */
     const fetchItems = async () => {
         try {
             const response = await api.get('/inventory', {
@@ -67,6 +108,11 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Handles changes to input fields within the form.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement>} e - The change event object.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'Location') {
@@ -84,6 +130,11 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Handles changes to the image input field.
+     *
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The change event object.
+     */
     const handleImageChange = (e) => {
         if (e.target.value.trim() !== '') {
             setInventoryItem((prevState) => ({
@@ -93,6 +144,9 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Performs a search for inventory items based on the current name in `inventoryItem`.
+     */
     const handleSearch = async () => {
         try {
             const response = await api.get('/inventory', {
@@ -112,6 +166,9 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Handles the update of an existing inventory item.
+     */
     const handleUpdate = async () => {
         try {
             await api.put(`/inventory/${inventoryItem.ID}`, inventoryItem, {
@@ -127,6 +184,9 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Handles the addition of a new inventory item.
+     */
     const handleAdd = async () => {
         try {
             await api.post('/inventory', inventoryItem, {
@@ -142,6 +202,9 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Handles the deletion of an inventory item.
+     */
     const handleDelete = async () => {
         if (!window.confirm('Are you sure you want to delete this item?')) return;
         try {
@@ -158,15 +221,28 @@ function UpdateInventory() {
         }
     };
 
+    /**
+     * Handles the selection of an item from search results.
+     *
+     * @param {Object} item - The selected inventory item.
+     */
     const handleSearchResultClick = (item) => {
         setInventoryItem(item);
         setIsSearchModalOpen(false);
     };
     
+    /**
+     * Handles modification of an item by navigating to the update page with the item's details.
+     *
+     * @param {Object} item - The inventory item to modify.
+     */
     const handleModify = (item) => {
         navigate('/update', { state: item, replace: true });
     };
 
+    /**
+     * Clears all fields in the form by resetting the `inventoryItem` state.
+     */
     const handleClear = () => {
         setInventoryItem({
             ID: '',
@@ -271,7 +347,7 @@ function UpdateInventory() {
                                     <div className="row row-cols-1 row-cols-md-3 g-4">
                                         {searchResults.map(item => (
                                             <div key={item.ID} className="col">
-                                                <ItemCard item={item} onModify={() => handleModify(item)} />
+                                                <ItemCard item={item} onModify={() => handleSearchResultClick(item)} />
                                             </div>
                                         ))}
                                     </div>

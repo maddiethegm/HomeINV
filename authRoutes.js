@@ -1,4 +1,5 @@
 // authRoutes.js
+
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -9,6 +10,14 @@ const { createRateLimiter } = require('./rateLimitMiddleware');
 const { executeQuery } = require('./dbquery');
 const loginRateLimiter = createRateLimiter();
 
+// tk This is the worst version of LDAP authentication, do better
+/**
+ * Authenticates a user using LDAP.
+ *
+ * @param {string} username - The username to authenticate.
+ * @param {string} password - The password for the user.
+ * @returns {Promise<boolean>} - Returns true if authentication succeeds, otherwise false.
+ */
 async function authenticateLDAP(username, password) {
     const userDnConstructed = `${process.env.LDAP_USER_ATTRIBUTE}=${username},${process.env.LDAP_DOMAIN_COMPONENTS}`;
     console.log('Constructed User DN:', userDnConstructed);
@@ -31,8 +40,22 @@ async function authenticateLDAP(username, password) {
     }
 }
 
+/**
+ * Sets up authentication routes for app.
+ *
+ * @param {import('express').Application} app - The Express application object.
+ * @param {object} config - Configuration settings for the database connection.
+ */
 function setupAuthRoutes(app, config) {
-app.post('/api/auth/register', authenticateToken, async (req, res) => {
+    /**
+     * Route to register a new user.
+     *
+     * @route POST /api/auth/register
+     * @param {string} req.body.Username - The username of the new user.
+     * @param {string} req.body.Password - The password for the new user.
+     * @param {string} req.body.Role - The role of the new user.
+     */
+    app.post('/api/auth/register', authenticateToken, async (req, res) => {
         try {
             const ID = generateUUID();
             const { Username, Password, Role } = req.body;
@@ -75,6 +98,13 @@ app.post('/api/auth/register', authenticateToken, async (req, res) => {
         }
     });
 
+    /**
+     * Route to authenticate a user and generate a JWT token.
+     *
+     * @route POST /api/auth/login
+     * @param {string} req.body.Username - The username of the user.
+     * @param {string} req.body.password - The password for the user.
+     */
     app.post('/api/auth/login', loginRateLimiter, async (req, res) => {
         const { Username, password } = req.body;
 
@@ -115,7 +145,8 @@ app.post('/api/auth/register', authenticateToken, async (req, res) => {
                     role: user.Role
                 };
 
-                const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+// Write a renew token function in authMiddleware.js so that you can set this back to 1h
+                const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
 
                 console.log('Login successful for username:', normalizedUsername);
                 return res.json({ token });

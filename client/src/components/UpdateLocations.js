@@ -1,9 +1,19 @@
 // src/components/UpdateLocations.js
+
+/**
+ * React component for updating locations.
+ * It allows users to search, add, update, or delete location details.
+ */
 import { useState, useEffect } from 'react';
 import LocationCard from './LocationCard'; // Import LocationCard component
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
+/**
+ * UpdateLocations component.
+ *
+ * @returns {JSX.Element} - The JSX element representing the update locations page.
+ */
 function UpdateLocations() {
     const [location, setLocation] = useState({
         ID: '',
@@ -20,6 +30,9 @@ function UpdateLocations() {
     const locationRoute = useLocation();
     const navigate = useNavigate();
 
+    /**
+     * Fetches the list of locations from the API.
+     */
     const fetchLocations = async () => {
         try {
             const response = await api.get('/locations', {
@@ -38,7 +51,9 @@ function UpdateLocations() {
         }
     };
 
-    
+    /**
+     * Effect hook to initialize location with data from route state if available and fetch locations.
+     */
     useEffect(() => {
         // Initialize location with data from route state if available
         if (locationRoute.state) {
@@ -47,7 +62,11 @@ function UpdateLocations() {
         fetchLocations();
     }, [locationRoute]);
 
-
+    /**
+     * Handles changes in the input fields and updates the location state.
+     *
+     * @param {Event} e - The event object containing the input field's new value.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLocation((prevState) => ({
@@ -56,6 +75,9 @@ function UpdateLocations() {
         }));
     };
 
+    /**
+     * Handles searching for locations based on the name.
+     */
     const handleSearch = async () => {
         try {
             const response = await api.get('/locations', {
@@ -75,6 +97,9 @@ function UpdateLocations() {
         }
     };
 
+    /**
+     * Handles updating an existing location.
+     */
     const handleUpdate = async () => {
         try {
             await api.put(`/locations/${location.ID}`, location, {
@@ -90,6 +115,9 @@ function UpdateLocations() {
         }
     };
 
+    /**
+     * Handles adding a new location.
+     */
     const handleAdd = async () => {
         try {
             await api.post('/locations', location, {
@@ -105,6 +133,9 @@ function UpdateLocations() {
         }
     };
 
+    /**
+     * Handles deleting an existing location.
+     */
     const handleDelete = async () => {
         if (!window.confirm('Are you sure you want to delete this location?')) return;
         try {
@@ -121,12 +152,18 @@ function UpdateLocations() {
         }
     };
 
-
-    
-        const handleModify = (locationRoute) => {
+    /**
+     * Modifies the location state with a new location object.
+     *
+     * @param {Object} locationRoute - The location object to modify.
+     */
+    const handleModify = (locationRoute) => {
         setLocation(locationRoute);
     };
-
+    const handleSearchResultClick = (location) => {
+        setLocation(location);
+        setIsSearchModalOpen(false);
+    };
     return (
         <div className="container mt-5">
             <h2>Update Locations</h2>
@@ -191,9 +228,9 @@ function UpdateLocations() {
                             </div>
                             <div className="modal-body">
                                 <div className="row row-cols-1 row-cols-md-3 g-4">
-                                    {searchResults.map(item => (
-                                        <div key={item.ID} className="col">
-                                            <LocationCard location={item} onModify={() => handleModify(item)} />
+                                    {searchResults.map(location => (
+                                        <div key={location.ID} className="col">
+                                            <LocationCard location={location} onModify={() => handleSearchResultClick(location)} />
                                         </div>
                                     ))}
                                 </div>

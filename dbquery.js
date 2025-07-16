@@ -1,4 +1,8 @@
-// dbquery.js
+/**
+ * @file dbquery.js
+ * @description Database query execution module.
+ */
+
 require('dotenv').config();
 const generateUUID = require('uuid').v4;
 const sql = require('mssql');
@@ -6,8 +10,18 @@ const oracledb = require('oracledb');
 const mysql = require('mysql2/promise');
 const { Client } = require('pg');
 
+/**
+ * Database type configuration from environment variable.
+ * @type {string}
+ */
 const DB_TYPE = process.env.DB_TYPE || 'MSSQL';
 
+/**
+ * Formats query parameters based on their keys and types.
+ *
+ * @param {Object} params - An object containing the parameters to format.
+ * @returns {Promise<Object>} A promise that resolves with formatted parameters.
+ */
 async function formatQueryParams(params) {
     const formattedParams = {};
     for (const key in params) {
@@ -28,6 +42,14 @@ async function formatQueryParams(params) {
     return formattedParams;
 }
 
+/**
+ * Executes a query against a MSSQL database.
+ *
+ * @param {Object} config - Database configuration object.
+ * @param {string} query - SQL query to execute.
+ * @param {Object} params - Parameters for the SQL query.
+ * @returns {Promise<Object>} A promise that resolves with the result of the query execution.
+ */
 async function executeMSSQLQuery(config, query, params) {
     const connection = await sql.connect(config);
     const request = connection.request();
@@ -43,6 +65,14 @@ async function executeMSSQLQuery(config, query, params) {
     return { recordset: result.recordset };
 }
 
+/**
+ * Executes a query against an Oracle database.
+ *
+ * @param {Object} config - Database configuration object.
+ * @param {string} query - SQL query to execute.
+ * @param {Object} params - Parameters for the SQL query.
+ * @returns {Promise<Object>} A promise that resolves with the result of the query execution.
+ */
 async function executeOracleQuery(config, query, params) {
     const connection = await oracledb.getConnection(config);
     const binds = await formatQueryParams(params);
@@ -53,11 +83,27 @@ async function executeOracleQuery(config, query, params) {
     return { recordset: result.rows };
 }
 
+/**
+ * Executes a query against a MariaDB database.
+ *
+ * @param {Object} config - Database configuration object.
+ * @param {string} query - SQL query to execute.
+ * @param {Object} params - Parameters for the SQL query.
+ * @returns {Promise<Object>} A promise that resolves with the result of the query execution.
+ */
 async function executeMariaDBQuery(config, query, params) {
     const [result] = await mysql.createConnection(config).execute(query, params);
     return { recordset: result };
 }
 
+/**
+ * Executes a query against a PostgreSQL database.
+ *
+ * @param {Object} config - Database configuration object.
+ * @param {string} query - SQL query to execute.
+ * @param {Object} params - Parameters for the SQL query.
+ * @returns {Promise<Object>} A promise that resolves with the result of the query execution.
+ */
 async function executePostgresQuery(config, query, params) {
     const connection = new Client(config);
     await connection.connect();
@@ -66,6 +112,14 @@ async function executePostgresQuery(config, query, params) {
     return { recordset: result.rows };
 }
 
+/**
+ * Executes a query against the configured database type.
+ *
+ * @param {Object} config - Database configuration object.
+ * @param {string} query - SQL query to execute.
+ * @param {Object} params - Parameters for the SQL query.
+ * @returns {Promise<Object>} A promise that resolves with the result of the query execution.
+ */
 async function executeQuery(config, query, params) {
     let result;
     switch (DB_TYPE.toUpperCase()) {
@@ -87,6 +141,14 @@ async function executeQuery(config, query, params) {
     return result;
 }
 
+/**
+ * Logs a transaction to the database.
+ *
+ * @param {Object} config - Database configuration object.
+ * @param {string} route - The API route that was called.
+ * @param {Object} requestPayload - Payload of the request.
+ * @param {string} authenticatedUsername - Username of the authenticated user.
+ */
 async function logTransaction(config, route, requestPayload, authenticatedUsername) {
     try {
         const ID = generateUUID();

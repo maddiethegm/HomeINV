@@ -1,26 +1,51 @@
 // src/components/HomePage.js
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * React component representing the home page.
+ * It displays a list of rooms and allows users to click on them to view items in those rooms.
+ */
 function HomePage() {
+    /**
+     * State hook to hold the list of rooms fetched from the API.
+     *
+     * @type {[Array, Function]}
+     */
     const [rooms, setRooms] = useState([]);
+
+    /**
+     * React Router's `useNavigate` hook for programmatic navigation.
+     *
+     * @type {Function}
+     */
     const navigate = useNavigate();
 
+    /**
+     * useEffect to fetch rooms when the component mounts.
+     */
     useEffect(() => {
         // Fetch rooms when the component mounts
         fetchRooms();
-    }, []);
+    }, []); // Empty dependency array ensures this effect runs only once after initial render
 
-const fetchRooms = async () => {
+    /**
+     * Asynchronous function to fetch rooms from the API.
+     *
+     * @async
+     * @returns {Promise<void>}
+     */
+    const fetchRooms = async () => {
         try {
-            const response = await axios.get( process.env.REACT_APP_API_URL + '/locations', {
+            const response = await axios.get(process.env.REACT_APP_API_URL + '/locations', {
                 params: { 
                     filterColumn: 'Name',
                     searchValue: '',
                     exactMatch: false
                 },
-                    headers: {
+                headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
@@ -30,7 +55,11 @@ const fetchRooms = async () => {
         }
     };
 
-
+    /**
+     * Function to handle room click event.
+     *
+     * @param {string} roomName - The name of the clicked room.
+     */
     const handleRoomClick = (roomName) => {
         navigate(`/items/${roomName}`);
     };

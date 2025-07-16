@@ -1,10 +1,25 @@
 // invRoutes.js
+
 require('dotenv').config();
 const generateUUID = require('uuid').v4;
 const { executeQuery, logTransaction } = require('./dbquery');
 const { authenticateToken } = require('./authMiddleware');
 
+/**
+ * Sets up inventory routes for app.
+ *
+ * @param {import('express').Application} app - The Express application object.
+ * @param {object} config - Configuration settings for the database connection.
+ */
 function setupInvRoutes(app, config) {
+    /**
+     * Route to get inventory items based on query parameters.
+     *
+     * @route GET /api/inventory
+     * @param {string} req.query.filterColumn - The column to filter by.
+     * @param {string} req.query.searchValue - The value to search for.
+     * @param {boolean} req.query.exactMatch - Whether to perform an exact match.
+     */
     app.get('/api/inventory', authenticateToken, async (req, res) => {
         try {
             const { filterColumn, searchValue, exactMatch } = req.query;
@@ -27,6 +42,13 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to update an inventory item.
+     *
+     * @route PUT /api/inventory/:ID
+     * @param {string} req.params.ID - The ID of the item to update.
+     * @param {object} req.body - The updated item data.
+     */
     app.put('/api/inventory/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
@@ -41,6 +63,12 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to delete an inventory item.
+     *
+     * @route DELETE /api/inventory/:ID
+     * @param {string} req.params.ID - The ID of the item to delete.
+     */
     app.delete('/api/inventory/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
@@ -54,6 +82,12 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to add a new inventory item.
+     *
+     * @route POST /api/inventory
+     * @param {object} req.body - The new item data.
+     */
     app.post('/api/inventory', authenticateToken, async (req, res) => {
         try {
             const { Name, Description, Location, Bin, Quantity, Image } = req.body;
@@ -61,13 +95,21 @@ function setupInvRoutes(app, config) {
             const query = `INSERT INTO Items (ID, Name, Description, Location, Bin, Quantity, Image) VALUES (@ID, @Name, @Description, @Location, @Bin, @Quantity, @Image)`;
             await executeQuery(config, query, { ID, Name, Description, Location, Bin, Quantity, Image });
             res.status(201).json({ success: true });
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null); // Use req.body here
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database insertion failed' });
         }
     });
 
+    /**
+     * Route to get locations based on query parameters.
+     *
+     * @route GET /api/locations
+     * @param {string} req.query.filterColumn - The column to filter by.
+     * @param {string} req.query.searchValue - The value to search for.
+     * @param {boolean} req.query.exactMatch - Whether to perform an exact match.
+     */
     app.get('/api/locations', authenticateToken, async (req, res) => {
         try {
             const { filterColumn, searchValue, exactMatch } = req.query;
@@ -90,6 +132,13 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to update a location.
+     *
+     * @route PUT /api/locations/:ID
+     * @param {string} req.params.ID - The ID of the location to update.
+     * @param {object} req.body - The updated location data.
+     */
     app.put('/api/locations/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
@@ -104,6 +153,12 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to delete a location.
+     *
+     * @route DELETE /api/locations/:ID
+     * @param {string} req.params.ID - The ID of the location to delete.
+     */
     app.delete('/api/locations/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
@@ -117,6 +172,12 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to add a new location.
+     *
+     * @route POST /api/locations
+     * @param {object} req.body - The new location data.
+     */
     app.post('/api/locations', authenticateToken, async (req, res) => {
         try {
             const { Name, Description, Building, Owner } = req.body;
@@ -131,9 +192,14 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to get rooms.
+     *
+     * @route GET /api/rooms
+     */
     app.get('/api/rooms', authenticateToken, async (req, res) => {
         try {
-            const query = `SELECT Name, ID FROM Rooms`; // Ensure you select the necessary fields
+            const query = `SELECT Name, ID FROM Rooms`;
             const result = await executeQuery(config, query);
             res.json(result.recordset);
             if (process.env.LOGGING === 'high') {
@@ -145,6 +211,13 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to update the quantity of an item.
+     *
+     * @route PUT /api/update-quantity/:id
+     * @param {string} req.params.id - The ID of the item to update.
+     * @param {number} req.body.quantity - The new quantity value.
+     */
     app.put('/api/update-quantity/:id', authenticateToken, async (req, res) => {
         try {
             const { quantity } = req.body;
@@ -165,6 +238,13 @@ function setupInvRoutes(app, config) {
         }
     });
 
+    /**
+     * Route to update the out-of-stock status of an item.
+     *
+     * @route PUT /api/update-out-of-stock/:id
+     * @param {string} req.params.id - The ID of the item to update.
+     * @param {boolean} req.body.isOutOfStock - The new out-of-stock status.
+     */
     app.put('/api/update-out-of-stock/:id', authenticateToken, async (req, res) => {
         try {
             const { isOutOfStock } = req.body;

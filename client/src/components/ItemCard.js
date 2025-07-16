@@ -1,18 +1,40 @@
 // src/components/ItemCard.js
+
+/**
+ * React component that represents a single item card.
+ * It displays item details and provides functionality to update quantity and modify items.
+ */
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; 
 
+/**
+ * ItemCard component.
+ *
+ * @param {Object} props - The properties passed to the component.
+ * @param {Object} props.item - The item object containing details like name, description, etc.
+ * @param {Function} props.onModify - Callback function to handle modification of the item.
+ * @returns {JSX.Element} - The JSX element representing the item card.
+ */
 function ItemCard({ item, onModify }) {
     const [quantity, setQuantity] = useState(item.Quantity);
     const [isOutOfStock, setIsOutOfStock] = useState(item.IsOutOfStock);
     const [isUpdating, setIsUpdating] = useState(false);
     const navigate = useNavigate();
+    
+    /**
+     * Handles changes to the quantity input field.
+     *
+     * @param {Event} e - The change event from the input field.
+     */
     const handleQuantityChange = (e) => {
         setQuantity(parseInt(e.target.value));
         setIsUpdating(true); // Change label to "Update"
     };
 
+    /**
+     * Updates the item quantity in the backend.
+     */
     const handleUpdateQuantity = async () => {
         try {
             // Update quantity in the backend
@@ -28,9 +50,15 @@ function ItemCard({ item, onModify }) {
             alert('Failed to update quantity');
         }
     };
+
+    /**
+     * Navigates to the modify item page.
+     */
     const handleModify = () => {
         navigate('/update-inventory', { state: item })
     };
+
+    // Generate quantity options for the dropdown
     const quantityOptions = [];
     for (let i = 0; i <= 20; i++) { // Adjust the range as needed
         quantityOptions.push(i);
@@ -39,13 +67,25 @@ function ItemCard({ item, onModify }) {
     return (
         <div className="card">
             <div className="card-body">
+                {/* Display item name */}
                 <h5 className="card-title">{item.Name}</h5>
+                
+                {/* Display item image, with a placeholder if none is available */}
                 <img src={item.Image || 'https://via.placeholder.com/150'} alt={item.Name} className="card-img-top" />
+                
+                {/* Display item description */}
                 <p className="card-text">Description: {item.Description}</p>
+                
+                {/* Display item location */}
                 <p className="card-text"><strong>Location:</strong> {item.Location}</p>
+                
+                {/* Quantity update and modify buttons */}
                 <div className="d-flex align-items-end justify-content-between">
                     <div className="d-flex flex-column">
+                        {/* Label for quantity or update action */}
                         <label className="mb-1">{isUpdating ? 'Update' : 'Quantity:'}</label>
+                        
+                        {/* Dropdown to select quantity */}
                         <select
                             value={quantity}
                             onChange={handleQuantityChange}
@@ -56,14 +96,18 @@ function ItemCard({ item, onModify }) {
                             ))}
                         </select>
                     </div>
+                    
+                    {/* Button to update quantity */}
                     <button
                         onClick={handleUpdateQuantity}
                         className="btn btn-primary ms-2"
                     >
                         Update Quantity
                     </button>
+                    
+                    {/* Button to modify item */}
                     <button
-                        onClick={handleModify}
+                        onClick={() => onModify(item)}
                         className="btn btn-warning ms-2"
                     >
                         Modify

@@ -1,7 +1,16 @@
 // src/services/api.js
+
+/**
+ * Module for creating an Axios instance configured for API requests.
+ * It includes interceptors to handle response errors, such as unauthorized or forbidden access.
+ */
+
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Create an Axios instance with a base URL and default headers.
+ */
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
     headers: {
@@ -9,6 +18,10 @@ const api = axios.create({
     },
 });
 
+/**
+ * Interceptor to handle response errors globally.
+ * If the error status is 401 or 403, it clears the token and redirects to the login page.
+ */
 api.interceptors.response.use(
     response => response,
     error => {
@@ -22,4 +35,7 @@ api.interceptors.response.use(
     }
 );
 
+/**
+ * Export the configured Axios instance for use throughout the application.
+ */
 export default api;
