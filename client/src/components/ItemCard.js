@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom';
  */
 function ItemCard({ item, onModify }) {
     const [quantity, setQuantity] = useState(item.Quantity);
-    const [isOutOfStock, setIsOutOfStock] = useState(item.IsOutOfStock);
     const [isUpdating, setIsUpdating] = useState(false);
     const navigate = useNavigate();
     
@@ -51,12 +50,7 @@ function ItemCard({ item, onModify }) {
         }
     };
 
-    /**
-     * Navigates to the modify item page.
-     */
-    const handleModify = () => {
-        navigate('/update-inventory', { state: item })
-    };
+
 
     // Generate quantity options for the dropdown
     const quantityOptions = [];
@@ -65,25 +59,25 @@ function ItemCard({ item, onModify }) {
     }
 
     return (
-        <div className="card">
+        <div className="card h-100">
+            {/* Display item name */}
+            <div className="card-header card-text">{item.Name}</div>
             <div className="card-body">
-                {/* Display item name */}
-                <h5 className="card-title">{item.Name}</h5>
-                
                 {/* Display item image, with a placeholder if none is available */}
                 <img src={item.Image || 'https://via.placeholder.com/150'} alt={item.Name} className="card-img-top" />
                 
-                {/* Display item description */}
-                <p className="card-text">Description: {item.Description}</p>
-                
-                {/* Display item location */}
-                <p className="card-text"><strong>Location:</strong> {item.Location}</p>
-                
+                {/* Display item description */}                {/* Display item location */}
+                <p className="card-text">
+                    Description: {item.Description}<br></br>
+                    Location: {item.Location}
+                </p>
+            </div>
+            <div className="card-footer">
                 {/* Quantity update and modify buttons */}
                 <div className="d-flex align-items-end justify-content-between">
                     <div className="d-flex flex-column">
                         {/* Label for quantity or update action */}
-                        <label className="mb-1">{isUpdating ? 'Update' : 'Quantity:'}</label>
+                        <label className="mb-1 card-text">{isUpdating ? 'Update' : 'Quantity:'}</label>
                         
                         {/* Dropdown to select quantity */}
                         <select

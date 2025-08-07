@@ -237,7 +237,7 @@ function UpdateInventory() {
      * @param {Object} item - The inventory item to modify.
      */
     const handleModify = (item) => {
-        navigate('/update', { state: item, replace: true });
+        navigate('/update-inventory', { state: item, replace: true });
     };
 
     /**
@@ -336,9 +336,9 @@ function UpdateInventory() {
                 {isSearchModalOpen && (
                     <div className="modal fade show" style={{ display: 'block' }}>
                         <div className="modal-dialog modal-lg">
-                            <div className="modal-content">
+                            <div className="modal-content upinv-window">
                                 <div className="modal-header justify-content-between">
-                                    <h5 className="modal-title">Search Results</h5>
+                                    <h5 className="modal-title ">Search Results</h5>
                                     <button type="button" className="close" onClick={() => setIsSearchModalOpen(false)}>
                                         <span aria-hidden="true">&times;</span>
                                     </button>

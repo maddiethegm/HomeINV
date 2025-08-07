@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children, role }) => {
         try {
             decodedToken = JSON.parse(atob(token.split('.')[1]));
         } catch (error) {
-            {/* Handle decoding error */}
+        {/* Handle decoding error */}
             console.error('Error decoding token:', error);
         }
     }

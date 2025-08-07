@@ -1,6 +1,5 @@
 // src/components/LocationCard.js
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 /**
  * A card component representing a location.
@@ -36,19 +35,21 @@ function LocationCard({ location, onModify }) {
                 className="card-img-top" 
                 style={{ height: '200px', objectFit: 'cover' }} 
             />
+            <div className="card-header card-text">{location.Name}</div>
             <div className="card-body">
-                <h5 className="card-title"><a href="#" onClick={() => onModify(location)}>{location.Name}</a></h5>
                 <p className="card-text">
                     <strong>Description:</strong> {location.Description}<br />
                     <strong>Building:</strong> {location.Building}<br />
                     <strong>Owner:</strong> {location.Owner}
                 </p>
                         {/* Button to modify item */}
-            <button
+            </div>
+            <div classname="card-footer">
+                <button
                 onClick={() => onModify(location)}
-                className="btn btn-warning ms-2">
-            Modify
-            </button>
+                className="btn btn-warning ms-2 mb-2 mt-2">
+                Modify
+                </button>
             </div>
 
         </div>

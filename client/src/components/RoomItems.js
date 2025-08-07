@@ -18,7 +18,9 @@ function RoomItems() {
     const { roomName } = useParams();
     const [items, setItems] = useState([]);
     const navigate = useNavigate();
-
+    const handleModify = (item) => {
+        navigate('/update-inventory', { state: item, replace: true });
+    };
     /**
      * useEffect hook to fetch items for the selected room when the component mounts.
      *
@@ -67,7 +69,7 @@ function RoomItems() {
             <div className="row row-cols-1 row-cols-md-3 g-4">
                 {items.map(item => (
                     <div key={item.ID} className="col-md-4 mb-4">
-                        <ItemCard item={item} />
+                        <ItemCard item={item} onModify={() => handleModify(item)} />
                     </div>
                 ))}
             </div>

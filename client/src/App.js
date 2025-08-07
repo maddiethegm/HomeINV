@@ -18,7 +18,8 @@ import Footer from './components/Footer';
 import ChangePassword from './components/ChangePassword';
 import ItemsReport from './components/reports/ItemsReport';
 import TransactionsReport from './components/reports/TransactionsReport';
-
+import Sidebar from './components/Sidebar';
+import image from './tenor1.gif';
 /**
  * Main application component.
  *
@@ -29,67 +30,69 @@ function App() {
         <Router>
             <div className="app-container">
                 <Navbar />
-                <main className="main-content">
-                    <Routes>
+                <div className="content-container">
+                    <main style={{ backgroundImage:`url(${image})`,backgroundRepeat:"no-repeat",backgroundSize:"cover" }} className="main-content">
+                        <Routes>
                         {/* Route for login page. */}
-                        <Route path="/login" element={<Login />} />
+                            <Route path="/login" element={<Login />} />
 
                         {/* Route for items report page. */}
-                        <Route path="/items-report" element={<ItemsReport />} />
+                            <Route path="/items-report" element={<ItemsReport />} />
 
                         {/* Route for transactions report page. */}
-                        <Route path="/transactions-report" element={<TransactionsReport />} />
+                            <Route path="/transactions-report" element={<TransactionsReport />} />
 
                         {/* Protected route for the home page. Requires authentication. */}
-                        <Route exact path="/" element={
-                            <ProtectedRoute>
-                                <HomePage />                        
-                            </ProtectedRoute>
-                        } />
+                            <Route exact path="/" element={
+                                <ProtectedRoute>
+                                    <HomePage />                        
+                                </ProtectedRoute>
+                            } />
 
                         {/* Protected route for inventory list page. Requires authentication. */}
-                        <Route path="/inventory-list" element={
-                            <ProtectedRoute>
-                                <InventoryList />                        
-                            </ProtectedRoute>
-                        } />
+                            <Route path="/inventory-list" element={
+                                <ProtectedRoute>
+                                    <InventoryList />                        
+                                </ProtectedRoute>
+                            } />
 
                         {/* Protected route for update inventory page. Requires authentication. */}
-                        <Route path="/update-inventory" element={
-                            <ProtectedRoute>
-                                <UpdateInventory />                        
-                            </ProtectedRoute>
-                        } />
+                            <Route path="/update-inventory" element={
+                                <ProtectedRoute>
+                                    <UpdateInventory />                        
+                                </ProtectedRoute>
+                            } />
 
                         {/* Protected route for update locations page. Requires authentication. */}
-                        <Route path="/update-locations" element={
-                            <ProtectedRoute>
-                                <UpdateLocations />                        
-                            </ProtectedRoute>
-                        } />
+                            <Route path="/update-locations" element={
+                                <ProtectedRoute>
+                                    <UpdateLocations />                        
+                                </ProtectedRoute>
+                            } />
 
                         {/* Protected route for change password page. Requires authentication. */}
-                        <Route path="/change-password" element={
-                            <ProtectedRoute>
-                                <ChangePassword />                        
-                            </ProtectedRoute>
-                        } />
+                            <Route path="/change-password" element={
+                                <ProtectedRoute>
+                                    <ChangePassword />                        
+                                </ProtectedRoute>
+                            } />
 
-                        {/* Protected route for room items page. Requires authentication and takes a `roomName` parameter. */}
-                        <Route path="/items/:roomName" element={
-                            <ProtectedRoute>
-                                <RoomItems />                        
-                            </ProtectedRoute>
-                        } />
+                            {/* Protected route for room items page. Requires authentication and takes a `roomName` parameter. */}
+                            <Route path="/items/:roomName" element={
+                                <ProtectedRoute>
+                                    <RoomItems />                        
+                                </ProtectedRoute>
+                            } />
 
                         {/* Protected route for registration page. Requires admin role. */}
-                        <Route path="/register" element={
-                            <ProtectedRoute role="admin">
-                                <Register />
-                            </ProtectedRoute>
-                        } />                
-                    </Routes>
-                </main>
+                            <Route path="/register" element={
+                                <ProtectedRoute role="admin">
+                                    <Register />
+                                </ProtectedRoute>
+                            } />                
+                        </Routes>
+                    </main>
+                </div>
                 <Footer />
             </div>
         </Router>
