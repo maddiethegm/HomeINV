@@ -30,7 +30,7 @@ function setupReportRoutes(app, config) {
             if (exactMatch === 'true') {
                 query = `SELECT * FROM Items WHERE ${filterColumn} = @searchValue`;
             } else {
-                query = `SELECT * FROM Items WHERE ${filterColumn} LIKE '%' + @searchValue + '%'`;
+                query = `SELECT * FROM Items WHERE CONCAT('%', ${filterColumn}, '%') LIKE CONCAT('%', @searchValue, '%')`;
             }
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });
@@ -68,7 +68,7 @@ function setupReportRoutes(app, config) {
             if (exactMatch === 'true') {
                 query = `SELECT * FROM Transactions WHERE ${filterColumn} = @searchValue`;
             } else {
-                query = `SELECT * FROM Transactions WHERE ${filterColumn} LIKE '%' + @searchValue + '%' ORDER BY Timestamp DESC`;
+                query = `SELECT * FROM Transactions WHERE CONCAT('%', ${filterColumn}, '%') LIKE CONCAT('%', @searchValue, '%') ORDER BY Timestamp DESC`;
             }
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });

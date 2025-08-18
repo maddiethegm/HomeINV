@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 const cors = require('cors');
-const setupAuthRoutes = require('./authRoutes')
+const setupUserRoutes = require('./userRoutes')
 const setupInvRoutes = require('./invRoutes')
 const setupReportRoutes = require('./reportRoutes')
 
@@ -51,7 +51,7 @@ sql.connect(config, err => {
 });
 
 // Setup routes
-setupAuthRoutes(app);
+setupUserRoutes(app);
 setupInvRoutes(app);
 setupReportRoutes(app);
 

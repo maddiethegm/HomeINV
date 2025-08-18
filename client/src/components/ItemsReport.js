@@ -5,7 +5,7 @@
  * It fetches item data from an API and provides options to filter, search, and export the data as CSV or PDF.
  */
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import api from '../services/api';
 import FileSaver from 'file-saver';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';

@@ -1,6 +1,6 @@
 // src/Components/Reports/TransactionsReport.js
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import api from '../services/api';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 import FileSaver from 'file-saver';
 import jsPDF from 'jspdf';

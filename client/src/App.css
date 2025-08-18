@@ -21,6 +21,13 @@ body {
     border-style: none outset outset outset;
     border-width: 1px;
 }
+.card-title {
+    font-size: 200%;
+}
+.card-nob {
+    overflow: hidden;
+    border-radius: 5px; /* Rounded corners */
+}
 .card-img-top {
     height: 150px; /* Fixed height for card images */
     object-fit: cover; /* Ensure images cover the area without distortion */
@@ -43,6 +50,11 @@ body {
 
 /* Navbar elements */
 .navbar {
+    color: #d2d3e0; /* White text for navbar items */
+ /*   font-weight: bold */
+}
+
+.nav-link {
     color: #d2d3e0; /* White text for navbar items */
  /*   font-weight: bold */
 }

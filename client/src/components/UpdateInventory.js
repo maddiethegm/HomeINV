@@ -1,87 +1,53 @@
+// src/components/UpdateInventory.js
 import React, { useState, useEffect } from 'react';
-import ItemCard from './ItemCard'; // Ensure this component is imported correctly
+import ItemList from './subcomponents/ItemList';
 import { useLocation, useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import * as itemsService from '../services/itemsService';
+import * as locationsService from '../services/locationsService';
+import { initialItemState } from '../models/Items';
+import { initialLocationState } from '../models/Locations';
 
 /**
  * UpdateInventory component for managing inventory items.
  * This component allows users to update, add, and delete inventory items.
  */
 function UpdateInventory() {
-    /**
-     * State to hold the current inventory item being edited or added.
-     */
-    const [inventoryItem, setInventoryItem] = useState({
-        ID: '',
-        Name: '',
-        Description: '',
-        LocationID: '',
-        Location: '',
-        Bin: '',
-        Quantity: 0,
-        Image: ''
-    });
+    // State to hold the current inventory item being edited or added
+    const [inventoryItem, setInventoryItem] = useState(initialItemState);
 
-    /**
-     * State to hold all available locations.
-     */
-    const [locations, setLocations] = useState([]);
+    // State to hold all available locations
+    const [locations, setLocations] = useState([initialLocationState]);
 
-    /**
-     * State to hold all items fetched from the server.
-     */
-    const [items, setItems] = useState([]); // State to hold all items
+    // State to hold all items fetched from the server
+    const [items, setItems] = useState([]);
 
-    /**
-     * State to hold search results for inventory items.
-     */
+    // State to hold search results for inventory items
     const [searchResults, setSearchResults] = useState([]);
 
-    /**
-     * State to control visibility of the search modal.
-     */
+    // State to control visibility of the search modal
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-    /**
-     * React Router location hook to access route parameters and state.
-     */
+    // React Router location hook to access route parameters and state
     const location = useLocation();
 
-    /**
-     * React Router navigate hook for programmatically navigating routes.
-     */
+    // React Router navigate hook for programmatically navigating routes
     const navigate = useNavigate();
 
-    /**
-     * useEffect to initialize the component.
-     * - Sets initial inventory item from location state if available.
-     * - Fetches locations and items on component mount.
-     */
+    // Filter parameters state
+    const [filterParams, setFilterParams] = useState({
+        Name: '',
+        Location: '',
+        Bin: ''
+    });
+
     useEffect(() => {
-        if (location.state) {
-            setInventoryItem(location.state);
-        }
-
-        fetchLocations();
-        fetchItems();
-    }, [location]);
-
-    /**
+   /**
      * Fetches all locations from the server and updates the `locations` state.
      */
     const fetchLocations = async () => {
         try {
-            const response = await api.get('/locations', {
-                params: { 
-                    filterColumn: 'Name',
-                    searchValue: '',
-                    exactMatch: false
-                },
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            setLocations(response.data);
+            const fetchedLocations = await locationsService.fetchLocations();
+            setLocations(fetchedLocations);
         } catch (error) {
             console.error('Error fetching locations:', error);
         }
@@ -92,17 +58,32 @@ function UpdateInventory() {
      */
     const fetchItems = async () => {
         try {
-            const response = await api.get('/inventory', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                },
-                params: { 
-                    filterColumn: 'Name',
-                    searchValue: '',
-                    exactMatch: false
-                }
-            });
-            setItems(response.data);
+            const fetchedItems = await itemsService.fetchItems();
+            setItems(fetchedItems);
+        } catch (error) {
+            console.error('Error fetching items:', error);
+        }
+    };
+    })
+    /**
+     * Fetches all locations from the server and updates the `locations` state.
+     */
+    const fetchLocations = async () => {
+        try {
+            const fetchedLocations = await locationsService.fetchLocations();
+            setLocations(fetchedLocations);
+        } catch (error) {
+            console.error('Error fetching locations:', error);
+        }
+    };
+
+    /**
+     * Fetches all inventory items from the server and updates the `items` state.
+     */
+    const fetchItems = async () => {
+        try {
+            const fetchedItems = await itemsService.fetchItems();
+            setItems(fetchedItems);
         } catch (error) {
             console.error('Error fetching items:', error);
         }
@@ -147,22 +128,16 @@ function UpdateInventory() {
     /**
      * Performs a search for inventory items based on the current name in `inventoryItem`.
      */
+    // Handle search
     const handleSearch = async () => {
         try {
-            const response = await api.get('/inventory', {
-                params: { 
-                    filterColumn: 'Name',
-                    searchValue: inventoryItem.Name,
-                    exactMatch: false
-                },
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+            setFilterParams({ 
+                Name: inventoryItem.Name,
+                Location: inventoryItem.Location,
+                Bin: inventoryItem.Bin
             });
-            setSearchResults(response.data);
-            setIsSearchModalOpen(true);
         } catch (error) {
-            console.error('Error fetching items:', error);
+            console.error('Error searching items:', error);
         }
     };
 
@@ -171,11 +146,7 @@ function UpdateInventory() {
      */
     const handleUpdate = async () => {
         try {
-            await api.put(`/inventory/${inventoryItem.ID}`, inventoryItem, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await itemsService.updateItem(inventoryItem.ID, inventoryItem);
             alert('Item updated successfully');
             fetchItems(); 
             navigate('.'); 
@@ -189,11 +160,7 @@ function UpdateInventory() {
      */
     const handleAdd = async () => {
         try {
-            await api.post('/inventory', inventoryItem, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await itemsService.addItem(inventoryItem);
             alert('Item added successfully');
             fetchItems(); 
             navigate('.'); 
@@ -208,11 +175,7 @@ function UpdateInventory() {
     const handleDelete = async () => {
         if (!window.confirm('Are you sure you want to delete this item?')) return;
         try {
-            await api.delete(`/inventory/${inventoryItem.ID}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await itemsService.deleteItem(inventoryItem.ID);
             alert('Item deleted successfully');
             fetchItems(); 
             navigate('.'); 
@@ -244,17 +207,17 @@ function UpdateInventory() {
      * Clears all fields in the form by resetting the `inventoryItem` state.
      */
     const handleClear = () => {
-        setInventoryItem({
-            ID: '',
-            Name: '',
-            Description: '',
-            LocationID: '',
-            Location: '',
-            Bin: '',
-            Quantity: 0,
-            Image: ''
-        });
+        setInventoryItem(initialItemState);
     };
+
+    useEffect(() => {
+        if (location.state) {
+            setInventoryItem(location.state);
+        }
+
+        fetchLocations();
+        fetchItems();
+    }, [location]);
 
     return (
         <div className="container mt-5">
@@ -332,39 +295,9 @@ function UpdateInventory() {
 
             {/* Scrolling area for items */}
             <div style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'scroll', marginTop: '20px' }}>
-                {/* Modal for Search Results */}
-                {isSearchModalOpen && (
-                    <div className="modal fade show" style={{ display: 'block' }}>
-                        <div className="modal-dialog modal-lg">
-                            <div className="modal-content upinv-window">
-                                <div className="modal-header justify-content-between">
-                                    <h5 className="modal-title ">Search Results</h5>
-                                    <button type="button" className="close" onClick={() => setIsSearchModalOpen(false)}>
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div className="modal-body">
-                                    <div className="row row-cols-1 row-cols-md-3 g-4">
-                                        {searchResults.map(item => (
-                                            <div key={item.ID} className="col">
-                                                <ItemCard item={item} onModify={() => handleSearchResultClick(item)} />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Full Grid of All Items */}
-                <div className="row row-cols-1 row-cols-md-3 g-4">
-                    {items.map(item => (
-                        <div key={item.ID} className="col">
-                            <ItemCard item={item} onModify={() => handleModify(item)} />
-                        </div>
-                    ))}
-                </div>
+            <ItemList items={items} onModify={handleModify} scrollable={false} filterParams={filterParams} />
             </div>
         </div>
     );

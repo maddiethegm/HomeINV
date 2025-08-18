@@ -1,13 +1,9 @@
 // src/components/UpdateLocations.js
-
-/**
- * React component for updating locations.
- * It allows users to search, add, update, or delete location details.
- */
-import { useState, useEffect } from 'react';
-import LocationCard from './LocationCard'; // Import LocationCard component
+import React, { useState, useEffect } from 'react';
+import LocationList from './subcomponents/LocationList'; // Import the new LocationList component
 import { useLocation, useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import * as locationsService from '../services/locationsService';
+import { initialLocationState } from '../models/Locations';
 
 /**
  * UpdateLocations component.
@@ -15,37 +11,37 @@ import api from '../services/api';
  * @returns {JSX.Element} - The JSX element representing the update locations page.
  */
 function UpdateLocations() {
-    const [location, setLocation] = useState({
-        ID: '',
+    // State to hold the current location being edited or added
+    const [location, setLocation] = useState(initialLocationState);
+
+    // State to hold all locations fetched from the server
+    const [locations, setLocations] = useState([]);
+
+    // State to hold search results for locations
+    const [searchResults, setSearchResults] = useState([]);
+
+    // State to control visibility of the search modal
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+    // Filter parameters state
+    const [filterParams, setFilterParams] = useState({
         Name: '',
-        Description: '',
-        Building: '',
-        Owner: '',
-        Image: ''
+        Building: ''
     });
 
-    const [locations, setLocations] = useState([]); // State to hold all locations
-    const [searchResults, setSearchResults] = useState([]);
-    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    // React Router location hook to access route parameters and state
     const locationRoute = useLocation();
+
+    // React Router navigate hook for programmatically navigating routes
     const navigate = useNavigate();
 
     /**
-     * Fetches the list of locations from the API.
+     * Fetches all locations from the server and updates the `locations` state.
      */
     const fetchLocations = async () => {
         try {
-            const response = await api.get('/locations', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                },
-                params: { 
-                    filterColumn: 'Name',
-                    searchValue: '',
-                    exactMatch: false
-                }
-            });
-            setLocations(response.data);
+            const fetchedLocations = await locationsService.fetchLocations();
+            setLocations(fetchedLocations);
         } catch (error) {
             console.error('Error fetching locations:', error);
         }
@@ -76,22 +72,15 @@ function UpdateLocations() {
     };
 
     /**
-     * Handles searching for locations based on the name.
+     * Handles searching for locations based on multiple parameters.
      */
     const handleSearch = async () => {
         try {
-            const response = await api.get('/locations', {
-                params: { 
-                    filterColumn: 'Name',
-                    searchValue: location.Name,
-                    exactMatch: false
-                },
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+            setFilterParams({
+                Name: location.Name,
+                Building: location.Building,
+                Owner: location.Owner
             });
-            setSearchResults(response.data);
-            setIsSearchModalOpen(true);
         } catch (error) {
             console.error('Error fetching locations:', error);
         }
@@ -102,11 +91,7 @@ function UpdateLocations() {
      */
     const handleUpdate = async () => {
         try {
-            await api.put(`/locations/${location.ID}`, location, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await locationsService.updateLocation(location.ID, location);
             alert('Location updated successfully');
             fetchLocations(); // Re-fetch the locations list
             navigate('.'); // Navigate back to self without state
@@ -120,11 +105,7 @@ function UpdateLocations() {
      */
     const handleAdd = async () => {
         try {
-            await api.post('/locations', location, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await locationsService.addLocation(location);
             alert('Location added successfully');
             fetchLocations(); // Re-fetch the locations list
             navigate('.'); // Navigate back to self without state
@@ -132,18 +113,17 @@ function UpdateLocations() {
             console.error('Error adding location:', error);
         }
     };
-
+    const handleClear = () => {
+        setLocation(initialLocationState);
+        navigate('.');
+    };
     /**
      * Handles deleting an existing location.
      */
     const handleDelete = async () => {
         if (!window.confirm('Are you sure you want to delete this location?')) return;
         try {
-            await api.delete(`/locations/${location.ID}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+            await locationsService.deleteLocation(location.ID);
             alert('Location deleted successfully');
             fetchLocations(); // Re-fetch the locations list
             navigate('.'); // Navigate back to self without state
@@ -155,18 +135,43 @@ function UpdateLocations() {
     /**
      * Modifies the location state with a new location object.
      *
-     * @param {Object} locationRoute - The location object to modify.
+     * @param {Object} location - The location object to modify.
      */
-    const handleModify = (locationRoute) => {
-        setLocation(locationRoute);
+    const handleModify = (location) => {
+        setLocation(location);
     };
+
+    /**
+     * Handles the selection of an item from search results.
+     *
+     * @param {Object} location - The selected location.
+     */
     const handleSearchResultClick = (location) => {
         setLocation(location);
         setIsSearchModalOpen(false);
     };
+
+    // Update filter parameters based on input changes
+    useEffect(() => {
+        setFilterParams({
+            Name: location.Name,
+            Building: location.Building
+        });
+    }, [location.Name, location.Building]);
+
     return (
         <div className="container mt-5">
             <h2>Update Locations</h2>
+                        {/* Image Preview */}
+            <div className="mt-5">
+                {location.Image && (
+                    <img
+                        src={location.Image}
+                        alt="Location"
+                        style={{ width: '50%', height: 'auto', border: '2px solid #ccc', borderRadius: '5px' }}
+                    />
+                )}
+            </div>
             <form>
                 <div className="d-flex flex-column mb-3">
                     <div className="mb-4">
@@ -198,6 +203,7 @@ function UpdateLocations() {
 
             {/* Buttons Container */}
             <div className="mb-4 d-flex justify-content-between">
+{/*               <button type="button" className="btn btn-primary me-2" onClick={handleSearch}>Search</button> */}
                 <button type="button" className="btn btn-primary me-2" onClick={handleSearch}>Search</button>
                 <button 
                     type="button" 
@@ -206,6 +212,7 @@ function UpdateLocations() {
                     disabled={location.Name === ''}>
                     {location.ID ? 'Update' : 'Add'}
                 </button>
+                <button type="button" className="btn btn-secondary me-2" onClick={handleClear}>Clear</button>
                 <button 
                     type="button" 
                     className="btn btn-danger me-2" 
@@ -220,20 +227,15 @@ function UpdateLocations() {
                 <div className="modal fade show" style={{ display: 'block' }}>
                     <div className="modal-dialog modal-lg">
                         <div className="modal-content">
-                            <div className="modal-header flex-d justify-content-between">
+                            <div className="modal-header justify-content-between">
                                 <h5 className="modal-title">Search Results</h5>
-                                <button type="button" class="close" onClick={() => setIsSearchModalOpen(false)}>
+                                <button type="button" className="close" onClick={() => setIsSearchModalOpen(false)}>
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <div className="row row-cols-1 row-cols-md-3 g-4">
-                                    {searchResults.map(location => (
-                                        <div key={location.ID} className="col">
-                                            <LocationCard location={location} onModify={() => handleSearchResultClick(location)} />
-                                        </div>
-                                    ))}
-                                </div>
+                                {/* Use LocationList for search results */}
+                                <LocationList locations={searchResults} filterParams={{}} onModify={handleSearchResultClick} />
                             </div>
                         </div>
                     </div>
@@ -241,24 +243,12 @@ function UpdateLocations() {
             )}
 
             {/* Full Grid of All Locations */}
-            <div className="row row-cols-1 row-cols-md-3 g-4">
-                {locations.map(location => (
-                    <div key={location.ID} className="col">
-                        <LocationCard location={location} onModify={() => handleModify(location)} />
-                    </div>
-                ))}
+            <div style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'scroll', marginTop: '20px' }}>
+                {/* Use LocationList for full list of locations */}
+                <LocationList locations={locations} filterParams={filterParams} onModify={handleModify} />
             </div>
 
-            {/* Image Preview */}
-            <div className="mt-5">
-                {location.Image && (
-                    <img
-                        src={location.Image}
-                        alt="Location"
-                        style={{ width: '100%', height: 'auto', border: '2px solid #ccc', borderRadius: '5px' }}
-                    />
-                )}
-            </div>
+
         </div>
     );
 }

@@ -5,7 +5,6 @@
  * It handles routing using react-router-dom and renders different pages based on the URL path.
  */
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import InventoryList from './components/InventoryList';
 import HomePage from './components/HomePage';
 import UpdateInventory from './components/UpdateInventory';
 import UpdateLocations from './components/UpdateLocations';
@@ -15,11 +14,11 @@ import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import ChangePassword from './components/ChangePassword';
-import ItemsReport from './components/reports/ItemsReport';
-import TransactionsReport from './components/reports/TransactionsReport';
-import Sidebar from './components/Sidebar';
+import ItemsReport from './components/ItemsReport';
+import TransactionsReport from './components/TransactionsReport';
 import image from './tenor1.gif';
+import UserManagement from './components/UserManagement';
+import UserProfile from './components/UserProfile';
 /**
  * Main application component.
  *
@@ -49,13 +48,6 @@ function App() {
                                 </ProtectedRoute>
                             } />
 
-                        {/* Protected route for inventory list page. Requires authentication. */}
-                            <Route path="/inventory-list" element={
-                                <ProtectedRoute>
-                                    <InventoryList />                        
-                                </ProtectedRoute>
-                            } />
-
                         {/* Protected route for update inventory page. Requires authentication. */}
                             <Route path="/update-inventory" element={
                                 <ProtectedRoute>
@@ -67,13 +59,6 @@ function App() {
                             <Route path="/update-locations" element={
                                 <ProtectedRoute>
                                     <UpdateLocations />                        
-                                </ProtectedRoute>
-                            } />
-
-                        {/* Protected route for change password page. Requires authentication. */}
-                            <Route path="/change-password" element={
-                                <ProtectedRoute>
-                                    <ChangePassword />                        
                                 </ProtectedRoute>
                             } />
 
@@ -89,7 +74,19 @@ function App() {
                                 <ProtectedRoute role="admin">
                                     <Register />
                                 </ProtectedRoute>
-                            } />                
+                            } />  
+                        {/* Protected route for user editing page. Requires admin role. */}
+                            <Route path="/manage-users" element={
+                                <ProtectedRoute role="admin">
+                                    <UserManagement />
+                                </ProtectedRoute>
+                            } />
+                        {/* Protected route for user profile page. Requires admin role. */}
+                            <Route path="/profile/:username" element={
+                                <ProtectedRoute role="admin">
+                                    <UserProfile />
+                                </ProtectedRoute>
+                            } />                 
                         </Routes>
                     </main>
                 </div>

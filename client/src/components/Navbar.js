@@ -66,6 +66,9 @@ function Navbar() {
                                     <li className="nav-item">
                                         <Link className="btn nav-light" to="/register">Add User</Link>
                                     </li>
+                                    <li className="nav-item">
+                                        <Link className="btn nav-light" to="/manage-users">Manage Users</Link>
+                                    </li>
                                 </>
                             )}
                         </ul>
