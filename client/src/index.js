@@ -10,7 +10,6 @@ import 'bootstrap/dist/css/bootstrap.rtl.min.css';
 import './index.css';
 import './App.css';
 
-import reportWebVitals from './reportWebVitals';
 
 /**
  * Creates a root for rendering the app and renders the main component.
@@ -21,13 +20,3 @@ root.render(
         <App />
     </React.StrictMode>,
 );
-
-/**
- * Optional: Function to measure performance of the application.
- *
- * @param {function} onPerfEntry - A function that takes a performance entry as an argument.
- */
-reportWebVitals(onPerfEntry => {
-    // Example usage:
-    console.log(onPerfEntry);
-});

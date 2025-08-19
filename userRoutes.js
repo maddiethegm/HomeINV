@@ -1,4 +1,4 @@
-// authRoutes.js
+// userRoutes.js
 
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
@@ -46,7 +46,7 @@ async function authenticateLDAP(username, password) {
  * @param {import('express').Application} app - The Express application object.
  * @param {object} config - Configuration settings defined in server.js.
  */
-function setupAuthRoutes(app, config) {
+function setupUserRoutes(app, config) {
     /**
      * Route to register a new user.
      *
@@ -58,8 +58,9 @@ function setupAuthRoutes(app, config) {
     app.post('/api/auth/register', authenticateToken, async (req, res) => {
         try {
             const ID = generateUUID();
-            const { Username, Password, Role } = req.body;
-            console.log('Registration request received:', { Username, Password, Role });
+            const { Username, Password, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER } = req.body;
+            console.log('Registration request received:', { Username, Password, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER });
+            
             if (!Username || !Password || !Role) {
                 return res.status(400).json({ error: 'Username, password, and role are required' });
             }
@@ -83,8 +84,14 @@ function setupAuthRoutes(app, config) {
             const hashedPassword = await bcrypt.hash(Password, saltRounds);
             console.log('Hashed password:', hashedPassword);
 
-            const queryInsert = `INSERT INTO Users (ID, Username, PasswordHash, Role) VALUES (@ID, @Username, @PasswordHash, @Role)`;
-            await executeQuery(config, queryInsert, { ID, Username: normalizedUsername, PasswordHash: hashedPassword, Role });
+            const queryInsert = `
+                INSERT INTO Users (ID, Username, PasswordHash, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER)
+                VALUES (@ID, @Username, @PasswordHash, @Role, @Email, @DisplayName, @AvatarURL, @UITheme, @Team, @Bio, @SQL_USER)
+            `;
+            await executeQuery(config, queryInsert, { 
+                ID, Username: normalizedUsername, PasswordHash: hashedPassword, Role,
+                Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER
+            });
             logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
             console.log('User registered successfully:', { Username });
             res.status(201).json({ message: 'User registered successfully' });
@@ -119,7 +126,7 @@ function setupAuthRoutes(app, config) {
 
         try {
             // Fetch user details from SQL Server
-            const query = `SELECT * FROM Users WHERE Username = @Username`;
+            const query = `SELECT * FROM Users WHERE LOWER(Username) = @Username`;
             const result = await executeQuery(config, query, { Username: normalizedUsername });
 
             if (result.recordset.length === 0) {
@@ -182,6 +189,145 @@ function setupAuthRoutes(app, config) {
             res.status(500).json({ error: 'Authentication failed' });
         }
     });
+
+    /**
+     * Route to fetch a list of all users.
+     *
+     * @route GET /api/users
+     */
+    app.get('/api/users', authenticateToken, async (req, res) => {
+        try {
+            // Fetch user details from SQL Server excluding PasswordHash
+            const query = `
+                SELECT ID, Username, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER
+                FROM Users
+            `;
+            const result = await executeQuery(config, query);
+
+            if (result.recordset.length === 0) {
+                return res.status(404).json({ error: 'No users found' });
+            }
+
+            console.log('All users retrieved:', result.recordset);
+            res.json(result.recordset);
+
+        } catch (err) {
+            if (err.code === 'EREQUEST') {
+                console.error('Database query failed:', err.originalError.info.message);
+                return res.status(500).json({ error: 'Database query failed' });
+            }
+            console.error('Fetch users error:', err);
+            res.status(500).json({ error: 'Failed to fetch users' });
+        }
+    });
+
+    /**
+     * Route to fetch user details by username.
+     *
+     * @route GET /api/users/:username
+     */
+    app.get('/api/users/:username', authenticateToken, async (req, res) => {
+        const { username } = req.params;
+
+        try {
+            // Fetch user details from SQL Server excluding PasswordHash
+            const query = `
+                SELECT ID, Username, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER
+                FROM Users WHERE LOWER(Username) = @Username
+            `;
+            const result = await executeQuery(config, query, { Username: username.toLowerCase() });
+
+            if (result.recordset.length === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const user = result.recordset[0];
+            console.log('User details retrieved:', user);
+            res.json(user);
+
+        } catch (err) {
+            if (err.code === 'EREQUEST') {
+                console.error('Database query failed:', err.originalError.info.message);
+                return res.status(500).json({ error: 'Database query failed' });
+            }
+            console.error('Fetch user details error:', err);
+            res.status(500).json({ error: 'Failed to fetch user details' });
+        }
+    });
+
+    /**
+     * Route to update user details by ID.
+     *
+     * @route PUT /api/users/:id
+     */
+    app.put('/api/users/:id', authenticateToken, async (req, res) => {
+        const { id } = req.params;
+        const { Username, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER } = req.body;
+
+        try {
+            // Validate the user ID
+            if (!id) {
+                return res.status(400).json({ error: 'User ID is required' });
+            }
+
+            const queryUpdate = `
+                UPDATE Users SET
+                    Username = @Username,
+                    Email = @Email,
+                    DisplayName = @DisplayName,
+                    AvatarURL = @AvatarURL,
+                    UITheme = @UITheme,
+                    Team = @Team,
+                    Bio = @Bio,
+                    SQL_USER = @SQL_USER
+                WHERE ID = @ID
+            `;
+            await executeQuery(config, queryUpdate, { 
+                Username, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER, ID: id
+            });
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            console.log('User updated successfully:', { id });
+            res.json({ message: 'User updated successfully' });
+
+        } catch (err) {
+            if (err.code === 'EREQUEST') {
+                console.error('Database query failed:', err.originalError.info.message);
+                return res.status(500).json({ error: 'Database query failed' });
+            }
+            console.error('Update user details error:', err);
+            res.status(500).json({ error: 'Failed to update user details' });
+        }
+    });
+
+    /**
+     * Route to delete a user by ID.
+     *
+     * @route DELETE /api/users/:id
+     */
+    app.delete('/api/users/:id', authenticateToken, async (req, res) => {
+        const { id } = req.params;
+
+        try {
+            // Validate the user ID
+            if (!id) {
+                return res.status(400).json({ error: 'User ID is required' });
+            }
+
+            const queryDelete = `DELETE FROM Users WHERE ID = @ID`;
+            await executeQuery(config, queryDelete, { ID: id });
+            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            console.log('User deleted successfully:', { id });
+            res.json({ message: 'User deleted successfully' });
+
+        } catch (err) {
+            if (err.code === 'EREQUEST') {
+                console.error('Database query failed:', err.originalError.info.message);
+                return res.status(500).json({ error: 'Database query failed' });
+            }
+            console.error('Delete user error:', err);
+            res.status(500).json({ error: 'Failed to delete user' });
+        }
+    });
 };
 
-module.exports = setupAuthRoutes;
+module.exports = setupUserRoutes;

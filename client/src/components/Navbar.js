@@ -4,6 +4,7 @@
  * React component for the navigation bar.
  * It displays different links based on whether a user is authenticated or not.
  */
+import {useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 /**
@@ -32,33 +33,41 @@ function Navbar() {
         localStorage.removeItem('token');
         navigate('/login');
     };
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
     return (
         <nav className="navbar glassy-navbar navbar-expand-lg">
             <div className="container-fluid">
-                <Link className="navbar-brand nav-dark" to="/">Inventory Home</Link>
+                {/* Hamburger button for toggling sidebar 
+                <button className="btn btn-primary me-2" data-bs-toggle="offcanvas" onClick={toggleSidebar} role="button">
+                    ☰
+                </button>*/}
+                <Link className="navbar-brand nav-dark me-2" to="/">Inventory Home</Link>
                 {token && decodedToken ? (
                     <>
-                        <ul className="navbar-nav me-auto mb-2 mb-lg-0 nav-light">
+                        <ul className="navbar-nav d-flex flex-row-reverse">
                             <li className="nav-item">
-                                <Link className="nav-light nav-link" to="/"></Link>
+                                <Link className="btn nav-light" to="/items-report">Items Report</Link>
                             </li>
                             <li>
-                                <Link className="nav-light nav-link" to="/items-report">Items Report</Link>
-                            </li>
-                            <li>
-                                <Link className="nav-light nav-link" to="/transactions-report">Transactions Report</Link>
+                                <Link className="btn nav-light" to="/transactions-report">Transactions Report</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link nav-light" to="/update-inventory">Items</Link>
+                                <Link className="btn nav-light" to="/update-inventory">Items</Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link nav-light" to="/update-locations">Locations</Link>
+                                <Link className="btn nav-light" to="/update-locations">Locations</Link>
                             </li>
                             {decodedToken.role === 'admin' && (
                                 <>
                                     <li className="nav-item">
-                                        <Link className="nav-link nav-light" to="/register">Add User</Link>
+                                        <Link className="btn nav-light" to="/register">Add User</Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link className="btn nav-light" to="/manage-users">Manage Users</Link>
                                     </li>
                                 </>
                             )}
@@ -66,7 +75,7 @@ function Navbar() {
                         <button className="btn btn-danger" onClick={handleLogout}>Logout</button>
                     </>
                 ) : (
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                    <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
                             <Link className="nav-link" to="/login">Login</Link>
                         </li>

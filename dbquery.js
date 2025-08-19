@@ -26,12 +26,20 @@ async function formatQueryParams(params) {
     for (const key in params) {
         if (key === 'ID') {
             formattedParams[key] = { type: sql.UniqueIdentifier, value: params[key] };
-        } else if (['Name', 'Description', 'Building', 'Owner', 'Role', 'Location', 'Route'].includes(key)) {
+        } else if (
+            ['Name', 'Description', 'Building', 'Owner', 'Role', 'Location', 'Route', 'Email', 'DisplayName', 'Team'].includes(key)
+        ) {
             formattedParams[key] = { type: sql.NVarChar(255), value: params[key] };
-        } else if (key === 'Username', 'AuthenticatedUsername') {
+        } else if (key === 'Username' || key === 'AuthenticatedUsername') { // Corrected here
             formattedParams[key] = { type: sql.NVarChar(50), value: params[key].toLowerCase() }; // Normalize to lowercase
-        } else if (['PasswordHash', 'Image'].includes(key)) {
-            formattedParams[key] = { type: sql.NVarChar(sql.MAX), value: params[key] };
+        } else if (key === 'UITheme') { // Corrected here
+            formattedParams[key] = { type: sql.NVarChar(50), value: params[key] }; 
+        } else if (key === 'UITHeme') {
+            formattedParams[key] = { type: sql.NVarChar(50), value: params[key] };
+        } else if (key === 'Bio', 'PasswordHash', 'Image', 'AvatarURL') {
+            formattedParams[key] = { type: sql.Text, value: params[key] };
+        } else if (key === 'SQL_USER') {
+            formattedParams[key] = { type: sql.Bit, value: params[key] }; // Support for bit data type
         } else if (typeof params[key] === 'string') {
             formattedParams[key] = { type: sql.NVarChar(255), value: params[key] };
         } else if (typeof params[key] === 'number') {
@@ -40,6 +48,7 @@ async function formatQueryParams(params) {
     }
     return formattedParams;
 }
+
 
 /**
  * Executes a query against a MSSQL database.
@@ -91,8 +100,25 @@ async function executeOracleQuery(config, query, params) {
  * @returns {Promise<Object>} A promise that resolves with the result of the query execution.
  */
 async function executeMariaDBQuery(config, query, params) {
-    const [result] = await mysql.createConnection(config).execute(query, params);
-    return { recordset: result };
+    const connectionConfig = {
+        host: process.env.DB_SERVER,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE,
+        namedPlaceholders: process.env.MARIA_NAMED_PLACEHOLDERS === 'true' || false
+    };
+
+    console.log('MariaDB Connection Config:', connectionConfig);
+
+    const connection = await mysql.createConnection(connectionConfig);
+
+    try {
+        const [result] = await connection.execute(query, params);
+        console.log('DB Query: ', query, 'with params', params)
+        return { recordset: result };
+    } finally {
+        connection.end();
+    }
 }
 
 /**

@@ -8,41 +8,63 @@ body {
     max-width: 80rem; /* Limit container width */
 }
 
+/* Card elements */
 .card {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.158); /* Glass-like effect with shadow */
     overflow: hidden;
+    backdrop-filter: blur(5px); /* Blur effect to give glass appearance */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Shadow for depth */
+    border-color:hsl(0, 0%, 100%);
     backdrop-filter: blur(30px);
-    background: hsla(0, 8%, 8%, 0);
+    background: hsla(0, 0%, 100%, 0.041);
+    border-style: none outset outset outset;
+    border-width: 1px;
 }
-
-.card-body {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Glass-like effect with shadow */
+.card-title {
+    font-size: 200%;
+}
+.card-nob {
     overflow: hidden;
-    backdrop-filter: blur(30px);
-    background: hsla(198, 13%, 20%, 0.208);
-}
-.loca-card {
-    color:#000000;
+    border-radius: 5px; /* Rounded corners */
 }
 .card-img-top {
     height: 150px; /* Fixed height for card images */
     object-fit: cover; /* Ensure images cover the area without distortion */
+    color: hsla(0, 0%, 100%, 0);
+    opacity: .8
+}
+.card-body {
+    overflow: hidden;
+    color:#000000;
+    backdrop-filter: blur(30px);
+    background: hsla(0, 0%, 0%, 0.112);
+}
+.card-text {
+    stroke-opacity: 1;
+    stroke:#ffffff;
+    stroke-width: 1px;
+    color:hsl(0, 0%, 100%);
+    filter:drop-shadow(0px 0px 30px hsl(0, 0%, 0%));
 }
 
-.btn {
-     background-color:#c1bbbb;
-}
+/* Navbar elements */
 .navbar {
     color: #d2d3e0; /* White text for navbar items */
-    background-color: #938eb1;
-    font-weight: bold
+ /*   font-weight: bold */
+}
+
+.nav-link {
+    color: #d2d3e0; /* White text for navbar items */
+ /*   font-weight: bold */
 }
 .glassy-navbar {
     background: rgba(0, 0, 0, 0.3); /* Semi-transparent black background */
     backdrop-filter: blur(5px); /* Blur effect to give glass appearance */
     border-radius: 2px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-    background-image: linear-gradient(to right, rgba(147, 152, 255, 0.908), rgba(255, 96, 255, 0.689)); /* Gradient overlay */
+    border-style: none none outset none;
+    border-color: rgba(153, 146, 146, 0.5);
 }
 .glassy-footer {
     background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
@@ -101,12 +123,19 @@ body {
     min-height: 100vh; /* Ensure the container takes at least full viewport height */
 }
 
+.content-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the container takes at least full viewport height */
+}
+
 .main-content {
     flex: 1; /* Allow main content to grow and fill available space */
     overflow-y: auto; /* Enable vertical scrolling if needed */
-    color:#000000;
-    background-color: #f5f5f5;
+    background-color: #312a2a;
     padding: 10px;
+    color: #d2d3e0; /* White text for navbar items */
+    font-weight: bold
 }
 
 .footer {
@@ -123,4 +152,13 @@ body {
 .nav-dark {
     color:#ffffff;
     -webkit-text-stroke: 0.3px;
+}
+
+.upinv-window {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Glass-like effect with shadow */
+    overflow: hidden;
+    color:#000000;
+    background: hsl(0, 0%, 100%);
+    border-style: none outset outset outset;
+    border-width: 1px;    
 }

@@ -29,7 +29,7 @@ function setupInvRoutes(app, config) {
             if (exactMatch === 'true') {
                 query = `SELECT * FROM Items WHERE ${filterColumn} = @searchValue`;
             } else {
-                query = `SELECT * FROM Items WHERE ${filterColumn} LIKE '%' + @searchValue + '%'`;
+                query = `SELECT * FROM Items WHERE CONCAT('%', ${filterColumn}, '%') LIKE CONCAT('%', @searchValue, '%')`;
             }
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });
@@ -53,9 +53,9 @@ function setupInvRoutes(app, config) {
     app.put('/api/inventory/:ID', authenticateToken, async (req, res) => {
         try {
             const { ID } = req.params;
-            const { Name, Description, Location, Bin, Quantity, Image } = req.body;
-            const query = `UPDATE Items SET Name = @Name, Description = @Description, Location = @Location, Bin = @Bin, Quantity = @Quantity, Image = @Image WHERE ID = @ID`;
-            await executeQuery(config, query, { ID, Name, Description, Location, Bin, Quantity, Image });
+            const { Name, Description, Location, Bin, Quantity, Image, Owner } = req.body;
+            const query = `UPDATE Items SET Name = @Name, Description = @Description, Location = @Location, Bin = @Bin, Quantity = @Quantity, Image = @Image, Owner = @Owner WHERE ID = @ID`;
+            await executeQuery(config, query, { ID, Name, Description, Location, Bin, Quantity, Image, Owner });
             res.json({ success: true });
             logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
@@ -91,10 +91,10 @@ function setupInvRoutes(app, config) {
      */
     app.post('/api/inventory', authenticateToken, async (req, res) => {
         try {
-            const { Name, Description, Location, Bin, Quantity, Image } = req.body;
+            const { Name, Description, Location, Bin, Quantity, Image, Owner } = req.body;
             const ID = generateUUID();
-            const query = `INSERT INTO Items (ID, Name, Description, Location, Bin, Quantity, Image) VALUES (@ID, @Name, @Description, @Location, @Bin, @Quantity, @Image)`;
-            await executeQuery(config, query, { ID, Name, Description, Location, Bin, Quantity, Image });
+            const query = `INSERT INTO Items (ID, Name, Description, Location, Bin, Quantity, Image, Owner) VALUES (@ID, @Name, @Description, @Location, @Bin, @Quantity, @Image, @Owner)`;
+            await executeQuery(config, query, { ID, Name, Description, Location, Bin, Quantity, Image, Owner });
             res.status(201).json({ success: true });
             logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
         } catch (err) {
@@ -119,7 +119,7 @@ function setupInvRoutes(app, config) {
             if (exactMatch === 'true') {
                 query = `SELECT * FROM Locations WHERE ${filterColumn} = @searchValue`;
             } else {
-                query = `SELECT * FROM Locations WHERE ${filterColumn} LIKE '%' + @searchValue + '%'`;
+                query = `SELECT * FROM Locations WHERE CONCAT('%', ${filterColumn}, '%') LIKE CONCAT('%', @searchValue, '%')`;
             }
 
             const result = await executeQuery(config, query, { filterColumn, searchValue });
