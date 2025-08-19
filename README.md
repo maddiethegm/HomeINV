@@ -1,7 +1,5 @@
 ## Welcome to HomeINV
-This is my first Node.JS development project- I started to get myself a basic understanding of Node.JS, and I feel I've had some success.
-
-Nonetheless, deploy my code at your own risk.
+This is my first Node.JS development project- I started to get myself a basic understanding of Node.JS, and I feel I've had some success. Nonetheless, deploy my code at your own risk.
 
 See package.json and client/package.json for startup scripts.
 
@@ -9,7 +7,6 @@ A .sql file is provided in the project root for you to create the necessary tabl
 
 See below for details on configuring the database parameters.
 
-Happy tinkering!
 
 ## Config
 ### API Server Configuration
