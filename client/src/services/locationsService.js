@@ -9,11 +9,6 @@ import api from '../services/api'; // Ensure this import is correct
 export const fetchLocations = async () => {
     try {
         const response = await api.get('/locations', {
-            params: { 
-                filterColumn: 'Name',
-                searchValue: '',
-                exactMatch: false
-            },
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }

@@ -8,6 +8,7 @@ const generateUUID = require('uuid').v4;
 const { authenticateToken } = require('./authMiddleware');
 const { createRateLimiter } = require('./rateLimitMiddleware');
 const { executeQuery, logTransaction } = require('./dbquery');
+const queryExecutor = require('./services/dbconnector/queryExecutor');
 const loginRateLimiter = createRateLimiter();
 
 // This is the worst version of LDAP authentication, do better
@@ -71,27 +72,24 @@ function setupUserRoutes(app, config) {
             console.log('Normalized username:', normalizedUsername);
 
             // Check if the user already exists
-            const queryCheck = `SELECT * FROM Users WHERE LOWER(Username) = @Username`;
-            const resultCheck = await executeQuery(config, queryCheck, { Username: normalizedUsername });
-            console.log('User check result:', resultCheck.recordset.length);
+            let params = { ID }
+            const table = 'Users'
+            let operation = 'READ'
+
+            const resultCheck = await queryExecutor.executeQuery(table, operation, params);
+            console.log('User check result:', resultCheck.length);
             logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);            
-            if (resultCheck.recordset.length > 0) {
+            if (resultCheck.length > 0) {
                 return res.status(409).json({ error: 'User already exists' });
             }
 
             // Hash the password
             const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(Password, saltRounds);
-            console.log('Hashed password:', hashedPassword);
-
-            const queryInsert = `
-                INSERT INTO Users (ID, Username, PasswordHash, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER)
-                VALUES (@ID, @Username, @PasswordHash, @Role, @Email, @DisplayName, @AvatarURL, @UITheme, @Team, @Bio, @SQL_USER)
-            `;
-            await executeQuery(config, queryInsert, { 
-                ID, Username: normalizedUsername, PasswordHash: hashedPassword, Role,
-                Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER
-            });
+            const PasswordHash = await bcrypt.hash(Password, saltRounds);
+            console.log('Hashed password:', PasswordHash);
+            params = { ID, Username, PasswordHash, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER }
+            operation = 'CREATE'
+            await queryExecutor.executeQuery(table, operation, params);
             logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
             console.log('User registered successfully:', { Username });
             res.status(201).json({ message: 'User registered successfully' });
@@ -126,15 +124,17 @@ function setupUserRoutes(app, config) {
 
         try {
             // Fetch user details from SQL Server
-            const query = `SELECT * FROM Users WHERE LOWER(Username) = @Username`;
-            const result = await executeQuery(config, query, { Username: normalizedUsername });
-
-            if (result.recordset.length === 0) {
+            let params = {
+                'Username': Username
+            }
+            const table = 'Users'
+            const operation = 'READ'
+            const result = await queryExecutor.executeQuery(table, operation, params);
+            if (result.length === 0) {
                 console.error('User not found for username:', normalizedUsername);
                 return res.status(401).json({ error: 'Invalid credentials' });
-            }
-
-            const user = result.recordset[0];
+            };
+            const user = result[0];
             console.log('User retrieved from database:', user);
 
             // Check if SQL_USER is set to 1 to bypass LDAP authentication
@@ -164,8 +164,8 @@ function setupUserRoutes(app, config) {
 
                 if (!isAuthenticatedLDAP) {
                     return res.status(401).json({ message: 'Invalid credentials' });
-                }
-
+                };
+                console.log('The current user is: ' + user.Username );
                 // If authenticated, generate a JWT token or set session
                 const payload = {
                     Username: user.Username,
@@ -197,27 +197,18 @@ function setupUserRoutes(app, config) {
      */
     app.get('/api/users', authenticateToken, async (req, res) => {
         try {
-            // Fetch user details from SQL Server excluding PasswordHash
-            const query = `
-                SELECT ID, Username, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER
-                FROM Users
-            `;
-            const result = await executeQuery(config, query);
-
-            if (result.recordset.length === 0) {
-                return res.status(404).json({ error: 'No users found' });
+            let params = req.body;
+            const table = 'Users';
+            const operation = 'READ';
+            const result = await queryExecutor.executeQuery(table, operation, params);
+            res.json(result);
+            if (process.env.LOGGING === 'high') {
+                logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
             }
-
-            console.log('All users retrieved:', result.recordset);
-            res.json(result.recordset);
-
+            console.log(result);
         } catch (err) {
-            if (err.code === 'EREQUEST') {
-                console.error('Database query failed:', err.originalError.info.message);
-                return res.status(500).json({ error: 'Database query failed' });
-            }
-            console.error('Fetch users error:', err);
-            res.status(500).json({ error: 'Failed to fetch users' });
+            console.error(err);
+            res.status(500).json({ error: 'Database query failed' });
         }
     });
 
@@ -227,21 +218,18 @@ function setupUserRoutes(app, config) {
      * @route GET /api/users/:username
      */
     app.get('/api/users/:username', authenticateToken, async (req, res) => {
-        const { username } = req.params;
-
-        try {
-            // Fetch user details from SQL Server excluding PasswordHash
-            const query = `
-                SELECT ID, Username, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER
-                FROM Users WHERE LOWER(Username) = @Username
-            `;
-            const result = await executeQuery(config, query, { Username: username.toLowerCase() });
-
-            if (result.recordset.length === 0) {
+        try {           
+            let params = {
+                'Username': req.params.username
+            }
+            const table = 'Users'
+            const operation = 'READ'
+            const result = await queryExecutor.executeQuery(table, operation, params);
+            if (typeof result !== 'object') {
                 return res.status(404).json({ error: 'User not found' });
             }
 
-            const user = result.recordset[0];
+            const user = result[0];
             console.log('User details retrieved:', user);
             res.json(user);
 
@@ -258,35 +246,21 @@ function setupUserRoutes(app, config) {
     /**
      * Route to update user details by ID.
      *
-     * @route PUT /api/users/:id
+     * @route PUT /api/users/:ID
      */
-    app.put('/api/users/:id', authenticateToken, async (req, res) => {
-        const { id } = req.params;
+    app.put('/api/users/:ID', authenticateToken, async (req, res) => {
+        const { ID } = req.params;
         const { Username, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER } = req.body;
-
+        let params = { ID, Username, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER }
+        const table = 'Users'
+        const operation = 'Update'
         try {
-            // Validate the user ID
-            if (!id) {
-                return res.status(400).json({ error: 'User ID is required' });
+            if (!ID) {
+                return res.status(400).json({ error: 'User ID is required'});
             }
-
-            const queryUpdate = `
-                UPDATE Users SET
-                    Username = @Username,
-                    Email = @Email,
-                    DisplayName = @DisplayName,
-                    AvatarURL = @AvatarURL,
-                    UITheme = @UITheme,
-                    Team = @Team,
-                    Bio = @Bio,
-                    SQL_USER = @SQL_USER
-                WHERE ID = @ID
-            `;
-            await executeQuery(config, queryUpdate, { 
-                Username, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER, ID: id
-            });
+            await queryExecutor.executeQuery(table, operation, params)
             logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
-            console.log('User updated successfully:', { id });
+            console.log('User updated successfully:', { ID });
             res.json({ message: 'User updated successfully' });
 
         } catch (err) {
@@ -304,17 +278,13 @@ function setupUserRoutes(app, config) {
      *
      * @route DELETE /api/users/:id
      */
-    app.delete('/api/users/:id', authenticateToken, async (req, res) => {
-        const { id } = req.params;
-
+    app.delete('/api/users/:ID', authenticateToken, async (req, res) => {
         try {
-            // Validate the user ID
-            if (!id) {
-                return res.status(400).json({ error: 'User ID is required' });
-            }
-
-            const queryDelete = `DELETE FROM Users WHERE ID = @ID`;
-            await executeQuery(config, queryDelete, { ID: id });
+            const { ID } = req.params;
+            let params = { ID };
+            const table = 'Users';
+            const operation = 'DELETE';
+            await queryExecutor.executeQuery(table, operation, params);
             logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
             console.log('User deleted successfully:', { id });
             res.json({ message: 'User deleted successfully' });

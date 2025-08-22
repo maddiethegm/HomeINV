@@ -5,7 +5,7 @@
  * It displays item details and provides functionality to update quantity and modify items.
  */
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { useNavigate } from 'react-router-dom'; 
 
 /**
@@ -36,8 +36,7 @@ function ItemCard({ item, onModify }) {
      */
     const handleUpdateQuantity = async () => {
         try {
-            // Update quantity in the backend
-            await axios.put(`${process.env.REACT_APP_API_URL}/update-quantity/${item.ID}`, { quantity }, {
+            await api.put(`/inventory/${item.ID}`, item, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }

@@ -9,12 +9,7 @@ import api from '../services/api'; // Ensure this import is correct
 export const fetchItems = async () => {
     try {
         const response = await api.get('/inventory', {
-            params: { 
-                filterColumn: 'Name',
-                searchValue: '',
-                exactMatch: false
-            },
-            headers: {
+                headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         });
