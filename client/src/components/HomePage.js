@@ -1,7 +1,7 @@
 // src/components/HomePage.js
 
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -39,12 +39,7 @@ function HomePage() {
      */
     const fetchRooms = async () => {
         try {
-            const response = await axios.get(process.env.REACT_APP_API_URL + '/locations', {
-                params: { 
-                    filterColumn: 'Name',
-                    searchValue: '',
-                    exactMatch: false
-                },
+            const response = await api.get('/locations', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }

@@ -5,9 +5,9 @@
  * It fetches items from an API and renders them using ItemCard components.
  */
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import ItemCard from './subcomponents/ItemCard';
+import api from '../services/api';
 
 /**
  * RoomItems component.
@@ -38,11 +38,9 @@ function RoomItems() {
      */
     const fetchRoomItems = async (roomName) => {
         try {
-            const response = await axios.get(process.env.REACT_APP_API_URL + '/inventory', {
-                params: { 
-                    filterColumn: 'Location',
-                    searchValue: roomName,
-                    exactMatch: true
+            const response = await api.get('/inventory', {
+                params: {
+                    Location: roomName 
                 },
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
