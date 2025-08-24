@@ -13,7 +13,6 @@ const port = process.env.PORT || 3001;
 const cors = require('cors');
 const setupUserRoutes = require('./userRoutes')
 const setupInvRoutes = require('./invRoutes')
-const setupReportRoutes = require('./reportRoutes')
 
 /**
  * Middleware to parse JSON bodies.
