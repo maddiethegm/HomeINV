@@ -14,8 +14,6 @@ import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import ItemsReport from './components/ItemsReport';
-import TransactionsReport from './components/TransactionsReport';
 import image from './tenor1.gif';
 import UserManagement from './components/UserManagement';
 import UserProfile from './components/UserProfile';
@@ -34,12 +32,6 @@ function App() {
                         <Routes>
                         {/* Route for login page. */}
                             <Route path="/login" element={<Login />} />
-
-                        {/* Route for items report page. */}
-                            <Route path="/items-report" element={<ItemsReport />} />
-
-                        {/* Route for transactions report page. */}
-                            <Route path="/transactions-report" element={<TransactionsReport />} />
 
                         {/* Protected route for the home page. Requires authentication. */}
                             <Route exact path="/" element={

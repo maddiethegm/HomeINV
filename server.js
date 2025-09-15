@@ -14,6 +14,7 @@ const cors = require('cors');
 const setupUserRoutes = require('./userRoutes')
 const setupInvRoutes = require('./invRoutes')
 
+
 /**
  * Middleware to parse JSON bodies.
  */
@@ -52,7 +53,7 @@ sql.connect(config, err => {
 // Setup routes
 setupUserRoutes(app);
 setupInvRoutes(app);
-setupReportRoutes(app);
+
 
 /**
  * Start the server and listen on the specified port.

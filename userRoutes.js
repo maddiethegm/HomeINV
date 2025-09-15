@@ -5,9 +5,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticate } = require('ldap-authentication');
 const generateUUID = require('uuid').v4;
-const { authenticateToken } = require('./authMiddleware');
-const { createRateLimiter } = require('./rateLimitMiddleware');
-const { executeQuery, logTransaction } = require('./dbquery');
+const { authenticateToken } = require('./services/authMiddleware');
+const { createRateLimiter } = require('./services/rateLimiter');
+const { logTransaction } = require('./services/logger');
 const queryExecutor = require('./services/dbconnector/queryExecutor');
 const loginRateLimiter = createRateLimiter();
 

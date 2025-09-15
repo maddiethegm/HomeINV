@@ -3,8 +3,8 @@
 require('dotenv').config();
 const generateUUID = require('uuid').v4;
 const queryExecutor = require('./services/dbconnector/queryExecutor');
-const { executeQuery, logTransaction } = require('./dbquery');
-const { authenticateToken } = require('./authMiddleware');
+const { logTransaction } = require('./services/logger');
+const { authenticateToken } = require('./services/authMiddleware');
 
 /**
  * Sets up inventory routes for app.

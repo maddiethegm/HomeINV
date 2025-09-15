@@ -50,12 +50,6 @@ function Navbar() {
                     <>
                         <ul className="navbar-nav d-flex flex-row-reverse">
                             <li className="nav-item">
-                                <Link className="btn nav-light" to="/items-report">Items Report</Link>
-                            </li>
-                            <li>
-                                <Link className="btn nav-light" to="/transactions-report">Transactions Report</Link>
-                            </li>
-                            <li className="nav-item">
                                 <Link className="btn nav-light" to="/update-inventory">Items</Link>
                             </li>
                             <li className="nav-item">
