@@ -7,13 +7,14 @@ import { getUserByUsername } from '../services/userService'; // Import necessary
 import { fetchLocations } from '../services/locationsService';
 import { fetchItems } from '../services/itemsService';
 import { ListGroup, Container } from 'react-bootstrap';
-
+import useInactivity from '../services/activity';
 /**
  * User Profile component to display a user's details and owned locations/items.
  *
  * @returns {JSX.Element} - The JSX element representing the user profile page.
  */
 function UserProfile() {
+    useInactivity();
     const [user, setUser] = useState(null);
     const [locations, setLocations] = useState([]);
     const [items, setItems] = useState([]);

@@ -6,12 +6,13 @@ import * as itemsService from '../services/itemsService';
 import * as locationsService from '../services/locationsService';
 import { initialItemState } from '../models/Items';
 import { initialLocationState } from '../models/Locations';
-
+import useInactivity from '../services/activity';
 /**
  * UpdateInventory component for managing inventory items.
  * This component allows users to update, add, and delete inventory items.
  */
 function UpdateInventory() {
+    useInactivity();
     // State to hold the current inventory item being edited or added
     const [inventoryItem, setInventoryItem] = useState(initialItemState);
 

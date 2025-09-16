@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/userService'; // Import the registerUser function
-
+import useInactivity from '../services/activity';
 /**
  * React component for user registration.
  * Allows users to create a new account by submitting their username, password, role, and other details.
  */
 function Register() {
+    useInactivity();
     /**
      * State to hold the user data input values.
      *

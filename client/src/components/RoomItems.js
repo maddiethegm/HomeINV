@@ -8,13 +8,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ItemCard from './subcomponents/ItemCard';
 import api from '../services/api';
-
+import useInactivity from '../services/activity';
 /**
  * RoomItems component.
  *
  * @returns {JSX.Element} - The JSX element representing the list of items in a specific room.
  */
 function RoomItems() {
+    useInactivity();
     const { roomName } = useParams();
     const [items, setItems] = useState([]);
     const navigate = useNavigate();

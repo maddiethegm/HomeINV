@@ -30,7 +30,7 @@ function setupInvRoutes(app, config) {
             const result = await queryExecutor.executeQuery(table, operation, params);
             res.json(result);
             if (process.env.LOGGING === 'high') {
-                logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+                logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
             }
             console.log(result);
         } catch (err) {
@@ -55,7 +55,7 @@ function setupInvRoutes(app, config) {
             const operation = 'UPDATE';
             await queryExecutor.executeQuery(table, operation, params);
             res.json({ success: true });
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database update failed' });
@@ -76,7 +76,7 @@ function setupInvRoutes(app, config) {
             const operation = 'DELETE';
             await queryExecutor.executeQuery(table, operation, params);
             res.json({ success: true });
-            logTransaction(config, req.route.path, `delete ${ID}`, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database deletion failed' });
@@ -98,7 +98,7 @@ function setupInvRoutes(app, config) {
             const operation = 'CREATE';
             await queryExecutor.executeQuery(table, operation, params);
             res.status(201).json({ success: true });
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database insertion failed' });
@@ -121,7 +121,7 @@ function setupInvRoutes(app, config) {
             const result = await queryExecutor.executeQuery(table, operation, params);
             res.json(result);
             if (process.env.LOGGING === 'high') {
-                logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+                logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
             }
             console.log(result);
         } catch (err) {
@@ -146,7 +146,7 @@ function setupInvRoutes(app, config) {
             const operation = 'UPDATE';
             await queryExecutor.executeQuery(config, query, { ID, Name, Description, Building, Owner, Image });
             res.json({ success: true });
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database update failed' });
@@ -189,7 +189,7 @@ function setupInvRoutes(app, config) {
             const operation = 'CREATE';
             await queryExecutor.executeQuery(table, operation, params);
             res.status(201).json({ success: true });
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database insertion failed' });

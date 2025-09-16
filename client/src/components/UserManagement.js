@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { fetchUsers, updateUser } from '../services/userService'; // Import necessary functions
-
+import useInactivity from '../services/activity';
 /**
  * User Management component to display and edit users.
  *
  * @returns {JSX.Element} - The JSX element representing the user management page.
  */
 function UserManagement() {
+    useInactivity();
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const navigate = useNavigate();

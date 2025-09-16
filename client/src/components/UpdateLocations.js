@@ -4,13 +4,14 @@ import LocationList from './subcomponents/LocationList'; // Import the new Locat
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as locationsService from '../services/locationsService';
 import { initialLocationState } from '../models/Locations';
-
+import useInactivity from '../services/activity';
 /**
  * UpdateLocations component.
  *
  * @returns {JSX.Element} - The JSX element representing the update locations page.
  */
 function UpdateLocations() {
+    useInactivity();
     // State to hold the current location being edited or added
     const [location, setLocation] = useState(initialLocationState);
 

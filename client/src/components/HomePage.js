@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import useInactivity from '../services/activity';
 
 /**
  * React component representing the home page.
  * It displays a list of rooms and allows users to click on them to view items in those rooms.
  */
 function HomePage() {
+    useInactivity();
     /**
      * State hook to hold the list of rooms fetched from the API.
      *

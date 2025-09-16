@@ -78,7 +78,7 @@ function setupUserRoutes(app, config) {
 
             const resultCheck = await queryExecutor.executeQuery(table, operation, params);
             console.log('User check result:', resultCheck.length);
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);            
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);            
             if (resultCheck.length > 0) {
                 return res.status(409).json({ error: 'User already exists' });
             }
@@ -90,7 +90,7 @@ function setupUserRoutes(app, config) {
             params = { ID, Username, PasswordHash, Role, Email, DisplayName, AvatarURL, UITheme, Team, Bio, SQL_USER }
             operation = 'CREATE'
             await queryExecutor.executeQuery(table, operation, params);
-            logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
             console.log('User registered successfully:', { Username });
             res.status(201).json({ message: 'User registered successfully' });
         } catch (err) {
@@ -203,7 +203,7 @@ function setupUserRoutes(app, config) {
             const result = await queryExecutor.executeQuery(table, operation, params);
             res.json(result);
             if (process.env.LOGGING === 'high') {
-                logTransaction(config, req.route.path, req.query, req.user ? req.user.Username : null);
+                logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
             }
             console.log(result);
         } catch (err) {
