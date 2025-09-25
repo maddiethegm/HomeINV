@@ -23,23 +23,19 @@ body {
 }
 .card-title {
     font-size: 200%;
+    color:hsl(0, 0%, 0%)
 }
 .card-nob {
     overflow: hidden;
     border-radius: 5px; /* Rounded corners */
 }
 .card-img-top {
-    height: 150px; /* Fixed height for card images */
+    max-height: 150px; /* Fixed height for card images */
     object-fit: cover; /* Ensure images cover the area without distortion */
     color: hsla(0, 0%, 100%, 0);
     opacity: .8
 }
-.card-body {
-    overflow: hidden;
-    color:#000000;
-    backdrop-filter: blur(30px);
-    background: hsla(0, 0%, 0%, 0.112);
-}
+
 .card-text {
     stroke-opacity: 1;
     stroke:#ffffff;

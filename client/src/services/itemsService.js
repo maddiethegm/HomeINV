@@ -6,9 +6,10 @@ import api from '../services/api'; // Ensure this import is correct
  *
  * @returns {Promise<Object[]>} - The promise resolving to an array of items.
  */
-export const fetchItems = async () => {
+export const fetchItems = async (params) => {
     try {
         const response = await api.get('/inventory', {
+                params: params,
                 headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }

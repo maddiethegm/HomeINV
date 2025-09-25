@@ -2,10 +2,8 @@
 import React from 'react';
 
 export const initialItemState = {
-    ID: '',
     Name: '',
     Description: '',
-    LocationID: '',
     Location: '',
     Bin: '',
     Quantity: 0,

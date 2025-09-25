@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sql = require('mssql');
 require('./setEnv');
+
 /**
  * Main entry point for the application.
  */
@@ -11,9 +12,8 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 const cors = require('cors');
-const setupUserRoutes = require('./userRoutes')
-const setupInvRoutes = require('./invRoutes')
-
+const setupUserRoutes = require('./userRoutes');
+const setupInvRoutes = require('./invRoutes');
 
 /**
  * Middleware to parse JSON bodies.
@@ -53,7 +53,6 @@ sql.connect(config, err => {
 // Setup routes
 setupUserRoutes(app);
 setupInvRoutes(app);
-
 
 /**
  * Start the server and listen on the specified port.

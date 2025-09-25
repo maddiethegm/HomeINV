@@ -15,7 +15,7 @@ const { authenticateToken } = require('./services/authMiddleware');
 function setupInvRoutes(app, config) {
     /**
      * Route to get inventory items based on query parameters.
-     * Next up to-do: filter by multiple columns
+     * Next up-to-do: filter by multiple columns
      *
      * @route GET /api/inventory
      * @param {string} req.query.filterColumn - The column to filter by.
@@ -24,7 +24,7 @@ function setupInvRoutes(app, config) {
      */
     app.get('/api/inventory', authenticateToken, async (req, res) => {
         try {
-            const params = req.body;
+            const params = req.query;
             const table = 'Items';
             const operation = 'READ';
             const result = await queryExecutor.executeQuery(table, operation, params);
@@ -50,12 +50,15 @@ function setupInvRoutes(app, config) {
         try {
             const { ID } = req.params;
             const { Name, Description, Location, Bin, Quantity, Image, Owner } = req.body;
-            const params = { ID, Name, Description, Location, Bin, Quantity, Image, Owner};
+            const params = { ID, Name, Description, Location, Bin, Quantity, Image, Owner };
             const table = 'Items';
             const operation = 'UPDATE';
             await queryExecutor.executeQuery(table, operation, params);
             res.json({ success: true });
-            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
+            params['OPER'] = operation;
+            const path = 'PUT ' + req.route.path;
+            const neatPath = path.slice(0, path.length - 3) + ID;
+            logTransaction(neatPath, params, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database update failed' });
@@ -76,7 +79,7 @@ function setupInvRoutes(app, config) {
             const operation = 'DELETE';
             await queryExecutor.executeQuery(table, operation, params);
             res.json({ success: true });
-            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
+            logTransaction(req.route.path + ID, req.query, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database deletion failed' });
@@ -98,7 +101,9 @@ function setupInvRoutes(app, config) {
             const operation = 'CREATE';
             await queryExecutor.executeQuery(table, operation, params);
             res.status(201).json({ success: true });
-            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
+            const path = 'POST ' + req.route.path;
+            const neatPath = path.slice(0, path.length - 3) + ID;
+            logTransaction(neatPath, params, req.user ? req.user.Username : null);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database insertion failed' });

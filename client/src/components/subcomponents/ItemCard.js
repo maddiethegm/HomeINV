@@ -6,8 +6,16 @@
  */
 import { useState } from 'react';
 import api from '../../services/api';
-import { useNavigate } from 'react-router-dom'; 
 
+// Helper function to validate URLs
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
 /**
  * ItemCard component.
  *
@@ -18,9 +26,7 @@ import { useNavigate } from 'react-router-dom';
  */
 function ItemCard({ item, onModify }) {
     const [quantity, setQuantity] = useState(item.Quantity);
-    const [isUpdating, setIsUpdating] = useState(false);
-    const navigate = useNavigate();
-    
+    const [isUpdating, setIsUpdating] = useState(false);   
     /**
      * Handles changes to the quantity input field.
      *
@@ -30,7 +36,6 @@ function ItemCard({ item, onModify }) {
         setQuantity(parseInt(e.target.value));
         setIsUpdating(true); // Change label to "Update"
     };
-
     /**
      * Updates the item quantity in the backend.
      */
@@ -48,67 +53,117 @@ function ItemCard({ item, onModify }) {
             alert('Failed to update quantity');
         }
     };
-
-
-
     // Generate quantity options for the dropdown
     const quantityOptions = [];
     for (let i = 0; i <= 20; i++) { // Adjust the range as needed
         quantityOptions.push(i);
-    }
+    };
+    if (isValidUrl(item.Image)) {
+        return (
+            <div className="card h-100">
+                {/* Display item name */}
+                <div className="card-header card-text">{item.Name}</div>
+                <div className="card-body">
+                    {/* Display item image, with a placeholder if none is available */}
+                    <img src={item.Image} alt={item.Name} className="card-img-top" />
 
-    return (
-        <div className="card h-100">
-            {/* Display item name */}
-            <div className="card-header card-text">{item.Name}</div>
-            <div className="card-body">
-                {/* Display item image, with a placeholder if none is available */}
-                <img src={item.Image || 'https://via.placeholder.com/150'} alt={item.Name} className="card-img-top" />
-                
-                {/* Display item description */}                {/* Display item location */}
-                <p className="card-text">
-                    Description: {item.Description}<br></br>
-                    Location: {item.Location}
-                </p>
-            </div>
-            <div className="card-footer">
-                {/* Quantity update and modify buttons */}
-                <div className="d-flex align-items-end justify-content-between">
-                    <div className="d-flex flex-column">
-                        {/* Label for quantity or update action */}
-                        <label className="mb-1 card-text">{isUpdating ? 'Update' : 'Quantity:'}</label>
-                        
-                        {/* Dropdown to select quantity */}
-                        <select
-                            value={quantity}
-                            onChange={handleQuantityChange}
-                            className="form-select"
+                    {/* Display item description */}                {/* Display item location */}
+                    <p className="card-text">
+                        Description: {item.Description}<br></br>
+                        Location: {item.Location}
+                    </p>
+                </div>
+                <div className="card-footer">
+                    {/* Quantity update and modify buttons */}
+                    <div className="d-flex align-items-end justify-content-between">
+                        <div className="d-flex flex-column">
+                            {/* Label for quantity or update action */}
+                            <label className="mb-1 card-text">{isUpdating ? 'Update' : 'Quantity:'}</label>
+
+                            {/* Dropdown to select quantity */}
+                            <select
+                                value={quantity}
+                                onChange={handleQuantityChange}
+                                className="form-select"
+                            >
+                                {quantityOptions.map((option) => (
+                                    <option key={option} value={option}>{option}</option>
+                                ))}
+                            </select>
+                        </div>
+                    
+                        {/* Button to update quantity */}
+                        <button
+                            onClick={handleUpdateQuantity}
+                            className="btn btn-primary ms-2"
                         >
-                            {quantityOptions.map((option) => (
-                                <option key={option} value={option}>{option}</option>
-                            ))}
-                        </select>
+                            Update Quantity
+                        </button>
+                                
+                        {/* Button to modify item */}
+                        <button
+                            onClick={() => onModify(item)}
+                            className="btn btn-warning ms-2"
+                        >
+                            Modify
+                        </button>
                     </div>
-                    
-                    {/* Button to update quantity */}
-                    <button
-                        onClick={handleUpdateQuantity}
-                        className="btn btn-primary ms-2"
-                    >
-                        Update Quantity
-                    </button>
-                    
-                    {/* Button to modify item */}
-                    <button
-                        onClick={() => onModify(item)}
-                        className="btn btn-warning ms-2"
-                    >
-                        Modify
-                    </button>
                 </div>
             </div>
-        </div>
-    );
+        );
+    }
+    else {
+        return (
+            <div className="card h-100">
+                {/* Display item name */}
+                <div className="card-header card-text">{item.Name}</div>
+                <div className="card-body">
+
+                    {/* Display item description */}                {/* Display item location */}
+                    <p className="card-text">
+                        Description: {item.Description}<br></br>
+                        Location: {item.Location}
+                    </p>
+                </div>
+                <div className="card-footer">
+                    {/* Quantity update and modify buttons */}
+                    <div className="d-flex align-items-end justify-content-between">
+                        <div className="d-flex flex-column">
+                            {/* Label for quantity or update action */}
+                            <label className="mb-1 card-text">{isUpdating ? 'Update' : 'Quantity:'}</label>
+
+                            {/* Dropdown to select quantity */}
+                            <select
+                                value={quantity}
+                                onChange={handleQuantityChange}
+                                className="form-select"
+                            >
+                                {quantityOptions.map((option) => (
+                                    <option key={option} value={option}>{option}</option>
+                                ))}
+                            </select>
+                        </div>
+                    
+                        {/* Button to update quantity */}
+                        <button
+                            onClick={handleUpdateQuantity}
+                            className="btn btn-primary ms-2"
+                        >
+                            Update Quantity
+                        </button>
+                                
+                        {/* Button to modify item */}
+                        <button
+                            onClick={() => onModify(item)}
+                            className="btn btn-warning ms-2"
+                        >
+                            Modify
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 }
 
 export default ItemCard;

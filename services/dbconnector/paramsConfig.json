@@ -15,13 +15,14 @@
         "Username": { "type": "nvarchar", "maxLength": 50 },
         "AuthenticatedUsername": { "type": "nvarchar", "maxLength": 50 },
         "UITheme": { "type": "nvarchar", "maxLength": 50 },
-        "Bio": { "type": "text" },
+        "Bio": { "type": "nvarchar", "maxlength": 255 },
         "PasswordHash": { "type": "text" },
-        "Image": { "type": "text" },
-        "AvatarURL": { "type": "text" },
+        "Image": { "type": "nvarchar", "maxLength": 255 },
+        "AvatarURL": { "type": "nvarchar", "maxlength": 255  },
         "SQL_USER": { "type": "bit" },
         "Text": { "type": "nvarchar", "maxLength": 255 },
-        "Quantity": { "type": "int" }
+        "Quantity": { "type": "int" },
+        "RequestPayload": { "type": "text" }
     },
     "oracle": {
         "ID": { "type": "string" },

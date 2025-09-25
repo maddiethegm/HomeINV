@@ -1,4 +1,5 @@
 // src/components/subcomponents/LocationList.js
+import React from 'react';
 import LocationCard from './LocationCard';
 /**
  * LocationList component.

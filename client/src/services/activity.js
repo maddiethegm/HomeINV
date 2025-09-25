@@ -29,6 +29,7 @@ function useInactivity() {
 
   useEffect(() => {
     if (!isActive) {
+      localStorage.removeItem('token');
       navigate('/login');
     }
   }, [isActive]);

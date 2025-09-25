@@ -22,50 +22,12 @@ function UpdateInventory() {
     // State to hold all items fetched from the server
     const [items, setItems] = useState([]);
 
-    // State to hold search results for inventory items
-    const [searchResults, setSearchResults] = useState([]);
-
-    // State to control visibility of the search modal
-    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-
     // React Router location hook to access route parameters and state
     const location = useLocation();
 
     // React Router navigate hook for programmatically navigating routes
     const navigate = useNavigate();
 
-    // Filter parameters state
-    const [filterParams, setFilterParams] = useState({
-        Name: '',
-        Location: '',
-        Bin: ''
-    });
-
-    useEffect(() => {
-   /**
-     * Fetches all locations from the server and updates the `locations` state.
-     */
-    const fetchLocations = async () => {
-        try {
-            const fetchedLocations = await locationsService.fetchLocations();
-            setLocations(fetchedLocations);
-        } catch (error) {
-            console.error('Error fetching locations:', error);
-        }
-    };
-
-    /**
-     * Fetches all inventory items from the server and updates the `items` state.
-     */
-    const fetchItems = async () => {
-        try {
-            const fetchedItems = await itemsService.fetchItems();
-            setItems(fetchedItems);
-        } catch (error) {
-            console.error('Error fetching items:', error);
-        }
-    };
-    })
     /**
      * Fetches all locations from the server and updates the `locations` state.
      */
@@ -97,19 +59,10 @@ function UpdateInventory() {
      */
     const handleChange = (e) => {
         const { name, value } = e.target;
-        if (name === 'Location') {
-            const selectedLocation = locations.find(loc => loc.Name === value);
-            setInventoryItem((prevState) => ({
-                ...prevState,
-                [name]: value,
-                LocationID: selectedLocation ? selectedLocation.ID : ''
-            }));
-        } else {
             setInventoryItem((prevState) => ({
                 ...prevState,
                 [name]: value
             }));
-        }
     };
 
     /**
@@ -132,11 +85,8 @@ function UpdateInventory() {
     // Handle search
     const handleSearch = async () => {
         try {
-            setFilterParams({ 
-                Name: inventoryItem.Name,
-                Location: inventoryItem.Location,
-                Bin: inventoryItem.Bin
-            });
+            const fetchedItems = await itemsService.fetchItems(inventoryItem);
+            setItems(fetchedItems);
         } catch (error) {
             console.error('Error searching items:', error);
         }
@@ -185,15 +135,6 @@ function UpdateInventory() {
         }
     };
 
-    /**
-     * Handles the selection of an item from search results.
-     *
-     * @param {Object} item - The selected inventory item.
-     */
-    const handleSearchResultClick = (item) => {
-        setInventoryItem(item);
-        setIsSearchModalOpen(false);
-    };
     
     /**
      * Handles modification of an item by navigating to the update page with the item's details.
@@ -209,6 +150,8 @@ function UpdateInventory() {
      */
     const handleClear = () => {
         setInventoryItem(initialItemState);
+        inventoryItem.Quantity = '';
+        fetchItems(inventoryItem);
     };
 
     useEffect(() => {
@@ -298,7 +241,7 @@ function UpdateInventory() {
             <div style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'scroll', marginTop: '20px' }}>
 
                 {/* Full Grid of All Items */}
-            <ItemList items={items} onModify={handleModify} scrollable={false} filterParams={filterParams} />
+            <ItemList items={items} onModify={handleModify} scrollable={false}/>
             </div>
         </div>
     );

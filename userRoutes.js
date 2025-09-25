@@ -179,7 +179,7 @@ function setupUserRoutes(app, config) {
                 console.error('LDAP authentication error:', ldapError);
                 return res.status(401).json({ message: 'Invalid credentials' });
             }
-            logTransaction(config, req.route.path, req.body.Username, req.body.username);            
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);            
         } catch (err) {
             if (err.code === 'EREQUEST') {
                 console.error('Database query failed:', err.originalError.info.message);
@@ -203,8 +203,7 @@ function setupUserRoutes(app, config) {
             const result = await queryExecutor.executeQuery(table, operation, params);
             res.json(result);
             if (process.env.LOGGING === 'high') {
-                logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
-            }
+                logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);            }
             console.log(result);
         } catch (err) {
             console.error(err);
@@ -232,7 +231,7 @@ function setupUserRoutes(app, config) {
             const user = result[0];
             console.log('User details retrieved:', user);
             res.json(user);
-
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
         } catch (err) {
             if (err.code === 'EREQUEST') {
                 console.error('Database query failed:', err.originalError.info.message);
@@ -259,7 +258,7 @@ function setupUserRoutes(app, config) {
                 return res.status(400).json({ error: 'User ID is required'});
             }
             await queryExecutor.executeQuery(table, operation, params)
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
             console.log('User updated successfully:', { ID });
             res.json({ message: 'User updated successfully' });
 
@@ -285,7 +284,7 @@ function setupUserRoutes(app, config) {
             const table = 'Users';
             const operation = 'DELETE';
             await queryExecutor.executeQuery(table, operation, params);
-            logTransaction(config, req.route.path, req.body, req.user ? req.user.Username : null);
+            logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
             console.log('User deleted successfully:', { id });
             res.json({ message: 'User deleted successfully' });
 

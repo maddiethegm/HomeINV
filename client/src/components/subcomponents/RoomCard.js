@@ -75,6 +75,34 @@ function LocationCard({ location, onModify }) {
             </div>
         );         
     }    
+    return (
+        <div className="card h-100">
+            {/* Fixed image size */}
+            <img 
+                src={location.Image || 'https://via.placeholder.com/150'} 
+                alt={location.Name} 
+                className="card-img-top" 
+                style={{ height: '200px', objectFit: 'cover' }} 
+            />
+            <div className="card-header card-text">{location.Name}</div>
+            <div className="card-body">
+                <p className="card-text">
+                    <strong>Description:</strong> {location.Description}<br />
+                    <strong>Building:</strong> {location.Building}<br />
+                    <strong>Owner:</strong> {location.Owner}
+                </p>
+                        {/* Button to modify item */}
+            </div>
+            <div classname="card-footer">
+                <button
+                onClick={() => onModify(location)}
+                className="btn btn-warning ms-2 mb-2 mt-2">
+                Modify
+                </button>
+            </div>
+
+        </div>
+    );
 };
 
 export default LocationCard;

@@ -11,7 +11,7 @@ import UpdateLocations from './components/UpdateLocations';
 import RoomItems from './components/RoomItems';
 import Login from './components/Login';
 import Register from './components/Register';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './services/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import image from './tenor1.gif';

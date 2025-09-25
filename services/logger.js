@@ -9,7 +9,7 @@ const { executeQuery } = require('./dbconnector/queryExecutor');
  * @param {Object} requestPayload - Payload of the request.
  * @param {string} authenticatedUsername - Username of the authenticated user.
  */
-async function logTransaction( route, requestPayload, authenticatedUsername) {
+async function logTransaction(route, requestPayload, authenticatedUsername) {
     try {
         const ID = generateUUID();
         const table = 'Transactions';
