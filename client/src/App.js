@@ -14,7 +14,7 @@ import Register from './components/Register';
 import ProtectedRoute from './services/ProtectedRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import image from './tenor1.gif';
+import backgroundGif from './tenor1.gif';
 import UserManagement from './components/UserManagement';
 import UserProfile from './components/UserProfile';
 /**
@@ -28,7 +28,7 @@ function App() {
             <div className="app-container">
                 <Navbar />
                 <div className="content-container">
-                    <main style={{ backgroundImage:`url(${image})`,backgroundRepeat:"no-repeat",backgroundSize:"cover" }} className="main-content">
+                    <main style={{ backgroundImage:`url(${backgroundGif})`,backgroundRepeat:"no-repeat",backgroundSize:"cover" }} className="main-content">
                         <Routes>
                         {/* Route for login page. */}
                             <Route path="/login" element={<Login />} />
