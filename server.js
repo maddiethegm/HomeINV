@@ -2,7 +2,7 @@
 const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
-const sql = require('mssql');
+const { executeQuery } = require('./services/dbconnector/queryExecutor');
 require('./setEnv');
 
 /**
@@ -30,25 +30,21 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
  */
 app.use(cors());
 
-// SQL Server Configuration
-const config = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    server: process.env.DB_SERVER,
-    database: process.env.DB_DATABASE,
-    options: {
-        encrypt: false,
-        trustServerCertificate: true,
-    }
-};
-
 /**
  * Test connection to the SQL Server database, err out if unavailable.
  */
-sql.connect(config, err => {
-    if (err) throw err;
-    console.log('Connected to SQL Server');
-});
+function sqlTest() {
+    try {
+        const table = '';
+        const operation = 'TEST';
+        const params = {};        
+        executeQuery(table, operation, params);
+        console.log('SQL Connection test successful');
+    } catch (err) {
+        console.error('SQL connection unavailable', err);
+    }
+}
+sqlTest();
 
 // Setup routes
 setupUserRoutes(app);

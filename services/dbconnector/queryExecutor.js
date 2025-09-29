@@ -58,9 +58,12 @@ async function executeQuery(table, operation, params) {
         case 'READ':
             return result.recordset || [];
         case 'UPDATE':
+            return { success: true, affectedRows: result.affectedRows };
         case 'DELETE':
             return { success: true, affectedRows: result.affectedRows };
         case 'CREATE':
+            return { success: true };
+        case 'TEST':
             return { success: true };
     }
     return result;
@@ -143,4 +146,4 @@ async function executePostgresQuery(connection, query, params) {
     }
 }
 
-module.exports = { executeQuery };
+module.exports = { executeQuery }; 
