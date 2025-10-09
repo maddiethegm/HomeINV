@@ -64,7 +64,7 @@ async function executeQuery(table, operation, params) {
         case 'CREATE':
             return { success: true };
         case 'TEST':
-            return { success: true };
+            return result.recordset || [];
     }
     return result;
 }

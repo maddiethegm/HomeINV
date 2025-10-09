@@ -1,6 +1,6 @@
 // src/components/UpdateInventory.js
 import React, { useState, useEffect } from 'react';
-import ItemList from './subcomponents/ItemList';
+import ItemList from './subcomponents/ItemGrid';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as itemsService from '../services/itemsService';
 import * as locationsService from '../services/locationsService';

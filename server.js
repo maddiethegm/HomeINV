@@ -38,8 +38,9 @@ function sqlTest() {
         const table = '';
         const operation = 'TEST';
         const params = {};        
-        executeQuery(table, operation, params);
+        const result = executeQuery(table, operation, params);
         console.log('SQL Connection test successful');
+        console.log(result);
     } catch (err) {
         console.error('SQL connection unavailable', err);
     }
