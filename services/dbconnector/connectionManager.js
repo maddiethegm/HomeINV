@@ -2,7 +2,6 @@
 
 require('dotenv').config();
 const sql = require('mssql');
-const oracledb = require('oracledb');
 const mysql = require('mysql2/promise');
 const { Client } = require('pg');
 
@@ -18,8 +17,6 @@ async function getConnection() {
     switch (dbType) {
         case 'MSSQL':
             return await sql.connect(config);
-        case 'ORACLE':
-            return await oracledb.getConnection(config);
         case 'MARIADB':
             return await mysql.createConnection(config);
         case 'POSTGRES':

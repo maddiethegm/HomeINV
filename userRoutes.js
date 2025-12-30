@@ -29,7 +29,6 @@ async function authenticateLDAP(username, password) {
         },
         userDn: userDnConstructed,
         userPassword: password,
-        starttls: true
     };
 
     try {

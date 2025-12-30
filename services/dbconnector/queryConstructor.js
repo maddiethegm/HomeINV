@@ -123,8 +123,6 @@ function generateCreateQuery(dbType, table, params) {
         case 'MARIADB':
             placeholders = Object.keys(params).map(() => `?`).join(', '); // Use ? for MariaDB
             break;
-        case 'ORACLE':
-            throw new Error('CREATE operation is not supported for ORACLE in this implementation.');
         default:
             throw new Error('Unsupported database type for this operation!');     
     }
@@ -159,14 +157,6 @@ function generateReadQuery(dbType, table, params) {
                         params[key] = `%${params[key]}%`; // Add % wildcard in params
                     } else {
                         condition = `${key} = @${key}`;
-                    }
-                    break;
-                case 'ORACLE':
-                    if (params.partialMatch) {
-                        condition = `${key} LIKE '%' || :${key} || '%'`;
-                        params[key] = `%${params[key]}%`; // Add % wildcard in params
-                    } else {
-                        condition = `${key} = :${key}`;
                     }
                     break;
                 case 'POSTGRES':
