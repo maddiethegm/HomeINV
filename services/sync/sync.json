@@ -1,0 +1,89 @@
+{
+  "MSSQL": {
+    "Users": { 
+        "ID": { "type": "uniqueidentifier" },
+        "Username": { "type": "nvarchar", "maxLength": 50 },
+        "DisplayName": { "type": "nvarchar", "maxLength": 255 },
+        "PasswordHash": { "type": "text" },
+        "AvatarURL": { "type": "text" },
+        "SQL_USER": { "type": "bit" },
+        "UITheme": { "type": "nvarchar", "maxLength": 50 },
+        "Team": { "type": "nvarchar", "maxLength": 255 },
+        "Bio": { "type": "nvarchar", "maxLength": 255 },
+        "Role": { "type": "nvarchar", "maxLength": 255 },
+        "Email": { "type": "nvarchar", "maxLength": 255 }
+    },
+    "Items": {
+        "ID": { "type": "uniqueidentifier" },
+        "Name": { "type": "nvarchar", "maxLength": 255 },
+        "Description": { "type": "nvarchar", "maxLength": 255 },
+        "Location": { "type": "nvarchar", "maxLength": 255 },
+        "Bin": { "type": "nvarchar", "maxLength": 255 },
+        "Quantity": { "type": "int" },
+        "Image": { "type": "nvarchar", "maxLength": 255 },
+        "Owner": { "type": "nvarchar", "maxLength": 255 }
+    },
+    "Locations": {
+        "ID": { "type": "uniqueidentifier" },
+        "Name": { "type": "nvarchar", "maxLength": 255 },
+        "Description": { "type": "nvarchar", "maxLength": 255 },
+        "Building": { "type": "nvarchar", "maxLength": 255 },
+        "Owner": { "type": "nvarchar", "maxLength": 255 },
+        "Image": { "type": "nvarchar", "maxLength": 255 }       
+    },
+    "Transactions": {
+        "ID": { "type": "uniqueidentifier" },
+        "AuthenticatedUsername": { "type": "nvarchar", "maxLength": 50 },
+        "Route": { "type": "nvarchar", "maxLength": 255 },
+        "RequestPayload": { "type": "text" },
+        "Timestamp": { "type": "datetime2" }
+    }
+  },
+  "SQLITE": {
+    "Users": { 
+        "ID": { "type": "text" },
+        "Username": { "type": "text" },
+        "DisplayName": { "type": "text" },
+        "PasswordHash": { "type": "text" },
+        "AvatarURL": { "type": "text" },
+        "SQL_USER": { "type": "text" },
+        "UITheme": { "type": "text" },
+        "Team": { "type": "text" },
+        "Bio": { "type": "text" },
+        "Role": { "type": "text" },
+        "Email": { "type": "text" }
+    },
+    "Items": {
+        "ID": { "type": "text" },
+        "Name": { "type": "text" },
+        "Description": { "type": "text" },
+        "Location": { "type": "text" },
+        "Bin": { "type": "text" },
+        "Quantity": { "type": "text" },
+        "Image": { "type": "text" },
+        "Owner": { "type": "text" }
+    },
+    "Locations": {
+        "ID": { "type": "text" },
+        "Name": { "type": "text" },
+        "Description": { "type": "text" },
+        "Building": { "type": "text" },
+        "Owner": { "type": "text" },
+        "Image": { "type": "text" }       
+    },
+    "Transactions": {
+        "ID": { "type": "text" },
+        "AuthenticatedUsername": { "type": "text" },
+        "Route": { "type": "text" },
+        "RequestPayload": { "type": "text" },
+        "Timestamp": { "type": "text" }
+    }
+  },
+
+  "syncMappings": [
+    {
+      "sourceTable": "Users",
+      "targetTable": "users"
+    }
+  ]
+}

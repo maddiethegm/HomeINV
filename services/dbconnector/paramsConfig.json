@@ -67,5 +67,27 @@
         "Image": { "type": "text" },
         "AvatarURL": { "type": "text" },
         "SQL_USER": { "type": "boolean" }
+    },
+    "sqlite": {
+        "ID": { "type": "text" },
+        "Name": { "type": "text" },
+        "Description": { "type": "text" },
+        "Text": { "type": "text" },
+        "Building": { "type": "text" },
+        "Owner": { "type": "text" },
+        "Role": { "type": "text" },
+        "Location": { "type": "text" },
+        "Route": { "type": "text" },
+        "Email": { "type": "text" },
+        "DisplayName": { "type": "text" },
+        "Team": { "type": "text" },
+        "Username": { "type": "text" },
+        "AuthenticatedUsername": { "type": "text" },
+        "UITheme": { "type": "text" },
+        "Bio": { "type": "text" },
+        "PasswordHash": { "type": "text" },
+        "Image": { "type": "text" },
+        "AvatarURL": { "type": "text" },
+        "SQL_USER": { "type": "text" }
     }
 }

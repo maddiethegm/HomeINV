@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { executeQuery } = require('./services/dbconnector/queryExecutor');
+const { syncData } = require('./services/sync/syncService')
 require('./setEnv');
 
 /**
@@ -45,7 +46,21 @@ function sqlTest() {
         console.error('SQL connection unavailable', err);
     }
 }
+
+function syncTest(syncConfig) {
+    try {
+        syncData(syncConfig);
+        console.log('Data synced to sqlite server');
+    } catch (err) {
+        console.error('Sync error', err)
+    }
+}
+const newdb = {
+    dbType: 'SQLITE',
+    filename: 'g:/share/dev/HomeINV/inv.db'
+}
 sqlTest();
+//syncTest(newdb);
 
 // Setup routes
 setupUserRoutes(app);

@@ -16,14 +16,14 @@ try {
  * @param {Object} params - An object containing the parameters to format.
  * @returns {Promise<Object>} A promise that resolves with formatted parameters.
  */
-async function formatQueryParams(params) {
-    const { DB_TYPE } = process.env;
+async function formatQueryParams(params, config = undefined) {
+    const dbType = config?.dbType || process.env.DB_TYPE;
     let formattedParams = {};
 
-    console.log(`Formatting query parameters for ${DB_TYPE.toUpperCase()}...`); // Debugging log
+    console.log(`Formatting query parameters for ${dbType.toUpperCase()}...`); // Debugging log
     console.log('Raw params:', params); // Log the raw parameters received
 
-    switch (DB_TYPE.toUpperCase()) {
+    switch (dbType.toUpperCase()) {
         case 'MSSQL':
             formattedParams = formatMSSQLParams(params, paramsConfig.mssql);
             break;
@@ -32,6 +32,9 @@ async function formatQueryParams(params) {
             break;
         case 'POSTGRES':
             formattedParams = formatPostgresParams(params, paramsConfig.postgres);
+            break;
+        case 'SQLITE':
+            formattedParams = formatSQLiteParams(params, paramsConfig.sqlite);
             break;
         default:
             throw new Error('Unsupported database type');
@@ -180,6 +183,45 @@ function formatPostgresParams(params, config) {
         formattedParams[key] = { type, value: params[key] };
     }
     return formattedParams;
+}
+/**
+ * Formats query parameters for SQLite.
+ *
+ * @param {Object} params - An object containing the parameters to format.
+ * @param {Object} config - Database-specific configuration from JSON.
+ * @returns {Object} Formatted parameters.
+ */
+function formatSQLiteParams(params, config) {
+    const formattedParams = {};
+    for (const key in params) {
+        if (!config[key]) {
+            console.warn(`Parameter '${key}' not defined in the configuration.`);
+            continue;
+        }
+
+        const paramConfig = config[key];
+        let type;
+
+        switch (paramConfig.type.toLowerCase()) {
+            case 'text':
+                type = 'TEXT';
+                break;
+            case 'integer':
+                type = 'INTEGER';
+                break;
+            case 'boolean':
+                type = 'BOOLEAN';
+                break;
+            case 'real':
+                type = 'REAL';
+                break;
+            default:
+                throw new Error(`Unsupported parameter type: ${paramConfig.type} for parameter '${key}'`);
+        }
+
+        formattedParams[key] = { type, value: params[key] };
+    }
+    return params;
 }
 
 module.exports = { formatQueryParams };

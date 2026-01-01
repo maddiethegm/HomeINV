@@ -14,19 +14,20 @@ const paramLibrary = require('./paramLibrary');
  * @param {Object} params - Parameters for the SQL query.
  * @returns {Promise<Object>} A promise that resolves with the result of the query execution.
  */
-async function executeQuery(table, operation, params) {
+async function executeQuery(table, operation, params, config = undefined) {
     console.log(`Executing query for ${operation.toUpperCase()} on table ${table}...`); // Debugging log
     console.log('Raw parameters:', params); // Log the raw parameters received
 
-    const query = await queryConstructor.generateQuery(table, operation, params);
+    const query = await queryConstructor.generateQuery(table, operation, params, config);
 
     let result;
+    const dbType = config?.dbType || process.env.DB_TYPE;
 
     try {
-        const formattedParams = await paramLibrary.formatQueryParams(params);
-        const connection = await connectionManager.getConnection();
+        const formattedParams = await paramLibrary.formatQueryParams(params, config);
+        const connection = await connectionManager.getConnection(config);
 
-        switch (process.env.DB_TYPE.toUpperCase()) {
+        switch (dbType.toUpperCase()) {
             case 'MSSQL':
                 console.log('Executing MSSQL query:', query); // Debugging log
                 console.log('Formatted parameters for MSSQL:', formattedParams); // Log the formatted parameters
@@ -41,6 +42,11 @@ async function executeQuery(table, operation, params) {
                 console.log('Executing PostgreSQL query:', query); // Debugging log
                 console.log('Formatted parameters for PostgreSQL:', formattedParams); // Log the formatted parameters
                 result = await executePostgresQuery(connection, query, formattedParams);
+                break;
+            case 'SQLITE':
+                console.log('Executing SQLite query:', query); // Debugging log
+                console.log('Formatted parameters for SQLite:', formattedParams); // Log the formatted parameters
+                result = await executeSQLiteQuery(connection, query, formattedParams);
                 break;
             default:
                 throw new Error('Unsupported database type');
@@ -113,6 +119,16 @@ async function executePostgresQuery(connection, query, params) {
         return { recordset: result.rows };
     } catch (error) {
         console.error('Error executing PostgreSQL query:', error.message);
+        throw error;
+    }
+}
+
+async function executeSQLiteQuery(connection, query, params) {
+    try {
+        const result = await connection.run(query, params);
+        return { rows: result }
+    } catch (error) {
+        console.error('Error executing SQLite query:', error.message);
         throw error;
     }
 }

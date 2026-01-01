@@ -8,33 +8,33 @@
  * @param {Object} params - Parameters for the SQL query.
  * @returns {Promise<string>} A promise that resolves with the constructed SQL query string.
  */
-async function generateQuery(table, operation, params) {
-    const { DB_TYPE } = process.env;
+async function generateQuery(table, operation, params, config = undefined) {
+    const dbType = config?.dbType || process.env.DB_TYPE;
     let query = '';
 
     switch (operation.toUpperCase()) {
         case 'CREATE':
             validateCreateParams(params);
-            query = generateCreateQuery(DB_TYPE, table, params); 
+            query = generateCreateQuery(dbType, table, params); 
             break;
         case 'READ':
             validateReadParams(params);
-            query = generateReadQuery(DB_TYPE, table, params);
+            query = generateReadQuery(dbType, table, params);
             break;
         case 'UPDATE':
             validateUpdateParams(params);
-            query = generateUpdateQuery(DB_TYPE, table, params);
+            query = generateUpdateQuery(dbType, table, params);
             break;
         case 'DELETE':
             validateDeleteParams(params);
-            query = generateDeleteQuery(DB_TYPE, table, params);
+            query = generateDeleteQuery(dbType, table, params);
             break;
 /*        case 'COMPARE':
             validateCompareParams(params);
-            query = generateCompareQuery(DB_TYPE, table, params);
+            query = generateCompareQuery(dbType, table, params);
             break; */
         case 'TEST':
-            query = generateTestQuery(DB_TYPE);
+            query = generateTestQuery(dbType);
             break;
         default:
             throw new Error('Unsupported operation');
@@ -107,7 +107,7 @@ function validateCompareParams(params) {
  * @returns {string} The constructed CREATE SQL query string.
  */
 function generateCreateQuery(dbType, table, params) {
-    const columns = Object.keys(params).join(', ');
+    let columns = (Object.keys(params).join(', '));
 
     // Generate placeholders based on dbType
     let placeholders;
@@ -122,6 +122,10 @@ function generateCreateQuery(dbType, table, params) {
             break;
         case 'MARIADB':
             placeholders = Object.keys(params).map(() => `?`).join(', '); // Use ? for MariaDB
+            break;
+        case 'SQLITE':
+            columns = (Object.keys(params).join(','));
+            placeholders = Object.keys(params).map(() => '?').join(', '); // Use ? for SQLite
             break;
         default:
             throw new Error('Unsupported database type for this operation!');     
@@ -175,6 +179,14 @@ function generateReadQuery(dbType, table, params) {
                         condition = `${key} = ?`;
                     }
                     break;
+                case 'SQLITE':
+                    if (params.partialMatch) {
+                        condition = `${key} LIKE ?`;
+                        params[key]= `%${params[key]}%`; // Add % wildcard in params
+                    } else {
+                        condition = `${key} = ?`;
+                    }
+                    break;
                 default:
                     throw new Error('Unsupported database type');
             }
@@ -210,6 +222,8 @@ async function generateUpdateQuery(dbType, table, params) {
                     return `${key} = $1`;
                 case 'MARIADB':
                     return `${key} = ?`;
+                case 'SQLITE':
+                    return `${key} = ?`;
                 default:
                     throw new Error('Unsupported database type');
             }
@@ -225,6 +239,9 @@ async function generateUpdateQuery(dbType, table, params) {
             whereClause = `WHERE ID = $2`;
             break;
         case 'MARIADB':
+            whereClause = `WHERE ID = ?`;
+            break;
+        case 'SQLITE':
             whereClause = `WHERE ID = ?`;
             break;
         default:
@@ -252,8 +269,8 @@ async function generateDeleteQuery(dbType, table, params) {
             return `DELETE FROM ${table} WHERE ID = $1;`; // Use $1 for PostgreSQL
         case 'MARIADB':
             return `DELETE FROM ${table} WHERE ID = ?;`;
-        case 'ORACLE':
-            throw new Error('DELETE operation is not supported for ORACLE in this implementation.');
+        case 'SQLITE':
+            return `DELETE FROM ${table} WHERE ID = ?;`;
         default:
             throw new Error('Unsupported database type!');
     }
@@ -273,8 +290,8 @@ async function generateTestQuery(dbType) {
             return `SELECT pg_backend_pid();`; // Use $1 for PostgreSQL
         case 'MARIADB':
             return `SELECT CONNECTION_ID();`;
-        case 'ORACLE':
-            return `SELECT SYS_CONTEXT('USERENV', 'SESSIONID') FROM dual;`;
+        case 'SQLITE':
+            return `SELECT sqlite_version();`;
         default:
             throw new Error('Unsupported database type!');
     }

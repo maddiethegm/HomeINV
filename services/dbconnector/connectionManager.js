@@ -4,25 +4,28 @@ require('dotenv').config();
 const sql = require('mssql');
 const mysql = require('mysql2/promise');
 const { Client } = require('pg');
+const betterSqlite3 = require('better-sqlite3');
 
 /**
  * Gets a connection based on the configured database type.
  *
  * @returns {Promise<Object>} A promise that resolves with the database connection.
  */
-async function getConnection() {
-    const dbType = process.env.DB_TYPE;
-    const config = getDBConfig(dbType);
-
+async function getConnection(config = {}) {
+    const dbType = config?.dbType || process.env.DB_TYPE;
+    const dbConfig = getDBConfig(dbType, config);
     switch (dbType) {
         case 'MSSQL':
-            return await sql.connect(config);
+            return await sql.connect(dbConfig);
         case 'MARIADB':
-            return await mysql.createConnection(config);
+            return await mysql.createConnection(dbConfig);
         case 'POSTGRES':
-            const client = new Client(config);
+            const client = new Client(dbConfig);
             await client.connect();
             return client;
+        case 'SQLITE':
+            const db = new betterSqlite3(dbConfig);
+            return db;
         default:
             throw new Error('Unsupported database type');
     }
@@ -34,45 +37,49 @@ async function getConnection() {
  * @param {string} dbType - Type of database (e.g., 'MSSQL', 'ORACLE').
  * @returns {Object} The database configuration object.
  */
-function getDBConfig(dbType) {
-    switch (dbType) {
+function getDBConfig(dbType, config = {}) {
+    // If no config was passed, use environment variables as defaults
+    const dbConfig = { ...config };
+
+    switch (dbType.toUpperCase()) {
         case 'MSSQL':
-            return {
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                server: process.env.DB_SERVER,
-                database: process.env.DB_DATABASE,
-                options: {
-                    encrypt: true, // for secure connection
-                    trustServerCertificate: true
-                }
+            dbConfig.user = dbConfig.user || process.env.DB_USER;
+            dbConfig.password = dbConfig.password || process.env.DB_PASSWORD;
+            dbConfig.server = dbConfig.server || process.env.DB_SERVER;
+            dbConfig.database = dbConfig.database || process.env.DB_DATABASE;
+            dbConfig.options = dbConfig.options || {
+                encrypt: true,
+                trustServerCertificate: true
             };
-        case 'ORACLE':
-            return {
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                connectString: process.env.ORACLE_CONNECTION_STRING
-            };
+            break;
+
         case 'MARIADB':
-            return {
-                host: process.env.DB_SERVER,
-                port: parseInt(process.env.DB_PORT, 10) || 3006,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_DATABASE,
-                namedPlaceholders: true
-            };
+            dbConfig.host = dbConfig.host || process.env.DB_SERVER;
+            dbConfig.port = dbConfig.port || parseInt(process.env.DB_PORT, 10) || 3006;
+            dbConfig.user = dbConfig.user || process.env.DB_USER;
+            dbConfig.password = dbConfig.password || process.env.DB_PASSWORD;
+            dbConfig.database = dbConfig.database || process.env.DB_DATABASE;
+            dbConfig.namedPlaceholders = dbConfig.namedPlaceholders || true;
+            break;
+
         case 'POSTGRES':
-            return {
-                host: process.env.DB_SERVER,
-                port: parseInt(process.env.DB_PORT, 10) || 5432,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: process.env.DB_DATABASE
-            };
+            dbConfig.host = dbConfig.host || process.env.DB_SERVER;
+            dbConfig.port = dbConfig.port || parseInt(process.env.DB_PORT, 10) || 5432;
+            dbConfig.user = dbConfig.user || process.env.DB_USER;
+            dbConfig.password = dbConfig.password || process.env.DB_PASSWORD;
+            dbConfig.database = dbConfig.database || process.env.DB_DATABASE;
+            break;
+
+        case 'SQLITE':
+            dbConfig.filename = dbConfig.filename || process.env.DB_FILE_PATH;
+            break;
+
         default:
             throw new Error('Unsupported database type');
     }
+
+    return dbConfig;
 }
+
 
 module.exports = { getConnection };
