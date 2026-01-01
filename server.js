@@ -3,8 +3,10 @@ const dotenv = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { executeQuery } = require('./services/dbconnector/queryExecutor');
-const { syncData } = require('./services/sync/syncService')
+const { syncData } = require('./services/sync/syncService');
 require('./setEnv');
+const http = require('http');
+const { setupWebSocketServer } = require('./socketServer');
 
 /**
  * Main entry point for the application.
@@ -15,6 +17,7 @@ const port = process.env.PORT || 3001;
 const cors = require('cors');
 const setupUserRoutes = require('./userRoutes');
 const setupInvRoutes = require('./invRoutes');
+const server =  http.createServer(app);
 
 /**
  * Middleware to parse JSON bodies.
@@ -62,6 +65,9 @@ const newdb = {
 sqlTest();
 //syncTest(newdb);
 
+// Setup websocket server
+setupWebSocketServer(server);
+
 // Setup routes
 setupUserRoutes(app);
 setupInvRoutes(app);
@@ -69,6 +75,6 @@ setupInvRoutes(app);
 /**
  * Start the server and listen on the specified port.
  */
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

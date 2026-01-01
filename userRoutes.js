@@ -284,7 +284,7 @@ function setupUserRoutes(app, config) {
             const operation = 'DELETE';
             await queryExecutor.executeQuery(table, operation, params);
             logTransaction(req.route.path, req.query, req.user ? req.user.Username : null);
-            console.log('User deleted successfully:', { id });
+            console.log('User deleted successfully:', { ID });
             res.json({ message: 'User deleted successfully' });
 
         } catch (err) {

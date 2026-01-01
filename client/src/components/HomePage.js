@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import useInactivity from '../services/activity';
+import Wstest from './SocketTest.js';
 
 /**
  * React component representing the home page.
@@ -63,6 +64,7 @@ function HomePage() {
 
     return (
         <div className="container mt-5">
+            <Wstest></Wstest>
             <div className="row row-cols-1 row-cols-md-3 g-4">
                 {rooms.map(room => (
                     <div key={room.ID} className="col">

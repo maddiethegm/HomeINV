@@ -4,7 +4,7 @@ require('dotenv').config();
 const sql = require('mssql');
 const mysql = require('mysql2/promise');
 const { Client } = require('pg');
-const betterSqlite3 = require('better-sqlite3');
+const sqlite3 = require('sqlite3');
 
 /**
  * Gets a connection based on the configured database type.
@@ -24,7 +24,7 @@ async function getConnection(config = {}) {
             await client.connect();
             return client;
         case 'SQLITE':
-            const db = new betterSqlite3(dbConfig);
+            const db = new sqlite3.Database(dbConfig.filename);
             return db;
         default:
             throw new Error('Unsupported database type');
@@ -71,7 +71,7 @@ function getDBConfig(dbType, config = {}) {
             break;
 
         case 'SQLITE':
-            dbConfig.filename = dbConfig.filename || process.env.DB_FILE_PATH;
+            dbConfig.filename = dbConfig.filename || process.env.DB_SQLITE_PATH;
             break;
 
         default:
