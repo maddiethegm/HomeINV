@@ -1,3 +1,5 @@
+# Original repo deprecated when I split the project into submodules.
+
 ## Welcome to HomeINV
 This is my first Node.JS development project- I started to get myself a basic understanding of Node.JS, and I feel I've had some success. Nonetheless, deploy my code at your own risk.
 
